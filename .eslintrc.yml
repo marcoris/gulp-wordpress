@@ -1,0 +1,136 @@
+# ES-Linter Options
+env:
+    browser: true
+    jquery: true
+    node: true
+    es6: true
+
+# ES-Linter Extension
+extends: eslint:recommended
+
+# ParserOptions has to be included
+parserOptions:
+    ecmaVersion: 6
+
+# SASS-Linter Rules https://eslint.org/docs/rules/
+## 0 = ignore
+## 1 = warnings
+## 2 = error
+rules:
+
+    # Brackets and Blocks
+    array-bracket-spacing:
+        - 2
+        - never
+        - singleValue: false
+          objectsInArrays: false
+          arraysInArrays: false
+    block-scoped-var: 2
+    block-spacing: 2
+    brace-style: 2
+    camelcase: 2
+
+    # Comma
+    comma-dangle:
+        - 2
+        - never
+    comma-spacing: 2
+    comma-style: 2
+    curly: 2
+    default-case: 0
+
+    # Dot
+    dot-location:
+        - 2
+        - property
+    dot-notation: 2
+
+    # End of line
+    eol-last: 2
+    eqeqeq: 0
+
+    # Function
+    func-call-spacing: 2
+    func-style: 0
+
+    # Indent
+    indent:
+        - error
+        - 4
+        - SwitchCase: 1
+
+    # Keys
+    key-spacing: 2
+    keyword-spacing: 2
+
+    # Line
+    linebreak-style:
+        - 2
+        - unix
+    lines-around-comment:
+        - 1
+        - beforeBlockComment: true
+          beforeLineComment: true
+          allowBlockStart: true
+    newline-after-var: 0
+    newline-before-return: 2
+    newline-per-chained-call: 0
+
+    # Disallows
+    no-case-declarations: 0
+    no-console: 1
+    no-unused-vars: 0
+    no-undef: 0
+    no-bitwise: 0
+    no-mixed-spaces-and-tabs: 0
+    no-global-assign: 2
+    no-lonely-if: 0
+    no-mixed-operators: 2
+    no-multi-spaces: 2
+    no-multi-str: 2
+    no-multiple-empty-lines: 2
+    no-negated-condition: 0
+    no-trailing-spaces: 2
+    no-useless-escape: 2
+    no-whitespace-before-property: 2
+
+    # Object
+    object-curly-newline:
+        - 2
+        - minProperties: 1
+    object-curly-spacing: 2
+    object-property-newline: 2
+
+    # One var per line
+    one-var-declaration-per-line: 2
+
+    # Padded blocks
+    padded-blocks:
+        - 2
+        - never
+
+    # Quotes
+    quotes:
+        - 2
+        - single
+        - avoidEscape: true
+
+    # Semicolon
+    semi:
+        - 2
+        - always
+    semi-spacing: 2
+
+    # Spaces
+    space-before-blocks: 2
+    space-before-function-paren:
+        - 0
+        - never
+    space-in-parens:
+        - 0
+        - always
+    space-infix-ops: 2
+    space-unary-ops: 2
+
+    # Vars
+    vars-on-top: 0
