@@ -46,6 +46,7 @@
     "gulp-sourcemaps": "^2.6.5",
     "gulp-uglify": "^3.0.2",
     "gulp-util": "^3.0.8",
+    "gulp-zip": "^5.0.1",
     "lodash.template": "^4.5.0",
     "vinyl-ftp": "^0.6.1",
     "vinyl-named": "^1.1.0",

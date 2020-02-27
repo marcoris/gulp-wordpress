@@ -14,6 +14,8 @@ import del from 'del';
 import webpack from 'webpack-stream';
 import named from 'vinyl-named';
 import browserSync from 'browser-sync';
+import zip from 'gulp-zip';
+import info from './package.json';
 
 const PRODUCTION = yargs.argv.prod;
 const server = browserSync.create();
@@ -90,6 +92,13 @@ export const reload = done => {
     done();
 };
 
+// Generate ZIP
+export const compress = () => {
+    return src('dist/**/*')
+        .pipe(zip(`${info.name}.zip`))
+        .pipe(dest('.'));
+};
+
 // Watch
 export const watchForChanges = () => {
     watch('src/scss/**/*.scss', styles);
@@ -100,5 +109,5 @@ export const watchForChanges = () => {
 };
 
 export const dev = series(clean, parallel(styles, images, copy, scripts), serve, watchForChanges);
-export const build = series(clean, parallel(styles, images, copy, scripts));
+export const build = series(clean, parallel(styles, images, copy, scripts), compress);
 export default dev;
