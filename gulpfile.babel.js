@@ -62,7 +62,7 @@ export const styles = () => {
         .pipe(banner(comment, {
             pkg
         }))
-        .pipe(dest('dist'))
+        .pipe(dest('dist/php'))
         .pipe(server.stream());
 };
 
@@ -116,19 +116,12 @@ export const compress = () => {
             file => file.relative.split('.').pop() !== 'zip',
             replace('_themename', pkg.name)
         ))
-        .pipe(replace('@@author', pkg.author))
-        .pipe(replace('@@website', pkg.website))
-        .pipe(replace('@@version', pkg.version))
-        .pipe(replace('@@description', pkg.description))
-        .pipe(replace('@@license', pkg.license))
-        .pipe(replace('@@uriLicense', pkg.licenseuri))
-        .pipe(replace('@@keywords', pkg.keywords))
         .pipe(zip(`${pkg.name}.zip`))
         .pipe(dest('./build'));
 };
 
 // Generate POT
-export const pot = () => {
+export const makePot = () => {
     return src('**/*.php')
         .pipe(
             wpPot({
@@ -149,5 +142,5 @@ export const watchForChanges = () => {
 };
 
 export const dev = series(clean, parallel(styles, images, copy, scripts), serve, watchForChanges);
-export const build = series(clean, parallel(styles, images, copy, scripts), pot, compress);
+export const build = series(clean, parallel(styles, images, copy, scripts), makePot, compress);
 export default dev;
