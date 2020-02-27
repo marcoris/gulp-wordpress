@@ -8,9 +8,17 @@ env:
 # ES-Linter Extension
 extends: eslint:recommended
 
+# ECMA
+ecmaFeatures:
+    module: true
+    spread: true
+    restParams: true
+    jsx: true
+
 # ParserOptions has to be included
 parserOptions:
     ecmaVersion: 6
+    sourceType: module
 
 # SASS-Linter Rules https://eslint.org/docs/rules/
 ## 0 = ignore
