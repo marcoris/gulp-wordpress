@@ -17,6 +17,10 @@ import pkg from './package.json';
 import replace from 'gulp-replace';
 import wpPot from 'gulp-wp-pot';
 import banner from 'gulp-banner';
+import prompt from 'gulp-prompt';
+import bumpVersion from 'gulp-bump';
+import conventionalChangelog from 'gulp-conventional-changelog';
+import notify from 'gulp-notify';
 
 const PRODUCTION = yargs.argv.prod;
 const server = browserSync.create();
@@ -115,6 +119,78 @@ export const scripts = () => {
         .pipe(dest('dist/js'));
 };
 
+// Bump version x.x.1
+export const bumpPatch = () => {
+    return src(['./package.json', './README.md'])
+        .pipe(bumpVersion({
+            type: 'patch'
+        }))
+        .pipe(dest('.'));
+};
+
+// Bump version x.1.x
+export const bumpMinor = () => {
+    return src(['./package.json', './README.md'])
+        .pipe(bumpVersion({
+            type: 'minor'
+        }))
+        .pipe(dest('.'));
+};
+
+// Bump version 1.x.x
+export const bumpMajor = () => {
+    return src(['./package.json', './README.md'])
+        .pipe(bumpVersion({
+            type: 'major'
+        }))
+        .pipe(dest('.'));
+};
+
+// Changelog
+export const changelog = () => {
+    return src('CHANGELOG.md', {
+        buffer: true
+    })
+        .pipe(conventionalChangelog({
+            preset: 'angular',
+            outputUnreleased: true
+        }))
+        .pipe(dest('.'));
+};
+
+// Show hint
+export const showHint = () => {
+    return src('./package.json')
+        .pipe(notify({
+            'title': 'Push release!',
+            'message': 'npm run addRelease',
+            'wait': true
+        }));
+};
+
+// Bump up project version
+export const bumpPrompt = () => {
+    const runPatch = series(bumpPatch, changelog, showHint);
+    const runMinor = series(bumpMinor, changelog, showHint);
+    const runMajor = series(bumpMajor, changelog, showHint);
+
+    return src('./gulpfile.babel.js')
+        .pipe(prompt.prompt({
+            type: 'checkbox',
+            name: 'bump',
+            message: 'What type of bump would you like to do?',
+            choices: ['patch', 'minor', 'major']
+        }, function(res) {
+            if (res.bump[0] == 'major') {
+                runMajor();
+            } else if (res.bump[0] == 'minor') {
+                runMinor();
+            } else {
+                runPatch();
+            }
+        }));
+};
+
 // Generate ZIP
 export const compress = () => {
     return src('dist/**/*')
@@ -148,4 +224,6 @@ export const watchForChanges = () => {
 
 export const dev = series(clean, parallel(styles, images, copy, scripts), serve, watchForChanges);
 export const build = series(clean, parallel(styles, images, copy, scripts), copyHtaccessProduction, compress);
+export const bump = series(bumpPrompt);
+export const hint = series(showHint);
 export default dev;

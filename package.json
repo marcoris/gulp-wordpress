@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "gulp",
-    "build": "gulp build --prod"
+    "build": "gulp build --prod",
+    "addRelease": "git add CHANGELOG.md package.json README.md && git commit --amend --no-edit && git tag node -e \"console.log('v' + require('./package.json').version)\" -m \"\"node -e \"console.log('Version ' + require('./package.json').version)\" && git push && git push --tags",
+    "getVersion": "node -e \"console.log('v' + require('./package.json').version)\""
   },
   "repository": {
     "type": "git",
@@ -51,7 +53,9 @@
     "gulp-if": "^3.0.0",
     "gulp-imagemin": "^7.1.0",
     "gulp-line-ending-corrector": "^1.0.3",
+    "gulp-notify": "^3.2.0",
     "gulp-postcss": "^8.0.0",
+    "gulp-prompt": "^1.2.0",
     "gulp-replace": "^1.0.0",
     "gulp-sass": "^4.0.2",
     "gulp-sass-lint": "^1.4.0",
