@@ -1,7 +1,5 @@
 // Initialize modules
-import {
-    src, dest, watch, series, parallel
-} from 'gulp';
+import {src, dest, watch, series, parallel} from 'gulp';
 import yargs from 'yargs';
 import sass from 'gulp-sass';
 import cleanCss from 'gulp-clean-css';
@@ -17,9 +15,25 @@ import browserSync from 'browser-sync';
 import zip from 'gulp-zip';
 import info from './package.json';
 import replace from 'gulp-replace';
+import wpPot from 'gulp-wp-pot';
 
 const PRODUCTION = yargs.argv.prod;
 const server = browserSync.create();
+
+// Browsersync
+const serve = done => {
+    server.init({
+        proxy: 'http://localhost'
+    });
+    done();
+};
+const reload = done => {
+    server.reload();
+    done();
+};
+
+// Clean
+export const clean = () => del(['dist', 'build']);
 
 // Styles
 export const styles = () => {
@@ -44,12 +58,9 @@ export const images = () => {
 
 // Copy
 export const copy = () => {
-    return src(['src/**/*', '!src/{images,js,scss}', '!src/{images,js,scss}/**/*'])
+    return src('src/**/*.php')
         .pipe(dest('dist'));
 };
-
-// Clean
-export const clean = () => del(['dist']);
 
 // Scripts
 export const scripts = () => {
@@ -81,18 +92,6 @@ export const scripts = () => {
         .pipe(dest('dist/js'));
 };
 
-// Browsersync
-export const serve = done => {
-    server.init({
-        proxy: 'http://localhost' // put your local website link here
-    });
-    done();
-};
-export const reload = done => {
-    server.reload();
-    done();
-};
-
 // Generate ZIP
 export const compress = () => {
     return src('dist/**/*')
@@ -100,8 +99,27 @@ export const compress = () => {
             file => file.relative.split('.').pop() !== 'zip',
             replace('_themename', info.name)
         ))
+        .pipe(replace('@@author', info.author))
+        .pipe(replace('@@website', info.website))
+        .pipe(replace('@@version', info.version))
+        .pipe(replace('@@description', info.description))
+        .pipe(replace('@@license', info.license))
+        .pipe(replace('@@uriLicense', info.licenseuri))
+        .pipe(replace('@@keywords', info.keywords))
         .pipe(zip(`${info.name}.zip`))
-        .pipe(dest('.'));
+        .pipe(dest('./build'));
+};
+
+// Generate POT
+export const pot = () => {
+    return src('**/*.php')
+        .pipe(
+            wpPot({
+                domain: '_themename',
+                package: info.name
+            })
+        )
+        .pipe(dest(`dist/languages/${info.name}.pot`));
 };
 
 // Watch
@@ -114,5 +132,5 @@ export const watchForChanges = () => {
 };
 
 export const dev = series(clean, parallel(styles, images, copy, scripts), serve, watchForChanges);
-export const build = series(clean, parallel(styles, images, copy, scripts), compress);
+export const build = series(clean, parallel(styles, images, copy, scripts), pot, compress);
 export default dev;
