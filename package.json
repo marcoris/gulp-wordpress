@@ -1,13 +1,11 @@
 {
   "name": "gulp-wordpress",
-  "version": "0.0.3",
+  "version": "0.0.2",
   "description": "Automated WordPress Theme development environment run by Gulp using Sass, Babel, Webpack, linters and BrowserSync.",
   "main": "index.js",
   "scripts": {
     "start": "gulp",
-    "build": "gulp build --prod",
-    "addRelease": "git add CHANGELOG.md package.json README.md && git commit --amend --no-edit && git tag node -e \"console.log('v' + require('./package.json').version)\" -m \"Version node -e \"console.log(require('./package.json').version)\" && git push && git push --tags",
-    "getVersion": "node -e \"console.log('v' + require('./package.json').version)\""
+    "build": "gulp build --prod"
   },
   "repository": {
     "type": "git",
@@ -57,6 +55,7 @@
     "gulp-postcss": "^8.0.0",
     "gulp-prompt": "^1.2.0",
     "gulp-replace": "^1.0.0",
+    "gulp-run": "^1.7.1",
     "gulp-sass": "^4.0.2",
     "gulp-sass-lint": "^1.4.0",
     "gulp-sourcemaps": "^2.6.5",

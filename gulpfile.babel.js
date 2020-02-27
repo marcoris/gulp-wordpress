@@ -225,7 +225,7 @@ export const watchForChanges = () => {
 
 // Release to github
 export const addRelease = () => {
-    return run('git add CHANGELOG.md README.md package.json && git commit --amend --no-edit && git tag v<%= pkg.version %> -m "Version <%= pkg.version %>" && git push && git push --tags').exec();
+    return run(`git add CHANGELOG.md README.md package.json && git commit --amend --no-edit && git tag v${pkg.version} -m "Version ${pkg.version}" && git push && git push --tags`).exec();
 };
 
 export const dev = series(clean, parallel(styles, images, copy, scripts), serve, watchForChanges);
