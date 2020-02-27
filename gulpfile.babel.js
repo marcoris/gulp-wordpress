@@ -13,9 +13,10 @@ import webpack from 'webpack-stream';
 import named from 'vinyl-named';
 import browserSync from 'browser-sync';
 import zip from 'gulp-zip';
-import info from './package.json';
+import pkg from './package.json';
 import replace from 'gulp-replace';
 import wpPot from 'gulp-wp-pot';
+import banner from 'gulp-banner';
 
 const PRODUCTION = yargs.argv.prod;
 const server = browserSync.create();
@@ -32,12 +33,25 @@ const reload = done => {
     done();
 };
 
+// WordPress banner
+const comment = '/*\n' +
+' * Theme Name: <%= pkg.name %>\n' +
+' * Author: <%= pkg.author %>\n' +
+' * Author URI: <%= pkg.website %>\n' +
+' * Description: <%= pkg.description %>\n' +
+' * Version: <%= pkg.version %>\n' +
+' * License: <%= pkg.license %>\n' +
+' * License URI: <%= pkg.license_uri %>\n' +
+' * Text Domain: <%= pkg.name %>\n' +
+' * Tags: <%= pkg.keywords %>\n' +
+'*/\n\n';
+
 // Clean
 export const clean = () => del(['dist', 'build']);
 
 // Styles
 export const styles = () => {
-    return src(['src/scss/style.scss', 'src/scss/admin.scss'])
+    return src('src/scss/style.scss')
         .pipe(gulpif(!PRODUCTION, sourcemaps.init()))
         .pipe(sass().on('error', sass.logError))
         .pipe(gulpif(PRODUCTION, postcss([autoprefixer])))
@@ -45,7 +59,10 @@ export const styles = () => {
             compatibility: 'ie8'
         })))
         .pipe(gulpif(!PRODUCTION, sourcemaps.write()))
-        .pipe(dest('dist/css'))
+        .pipe(banner(comment, {
+            pkg
+        }))
+        .pipe(dest('dist'))
         .pipe(server.stream());
 };
 
@@ -97,16 +114,16 @@ export const compress = () => {
     return src('dist/**/*')
         .pipe(gulpif(
             file => file.relative.split('.').pop() !== 'zip',
-            replace('_themename', info.name)
+            replace('_themename', pkg.name)
         ))
-        .pipe(replace('@@author', info.author))
-        .pipe(replace('@@website', info.website))
-        .pipe(replace('@@version', info.version))
-        .pipe(replace('@@description', info.description))
-        .pipe(replace('@@license', info.license))
-        .pipe(replace('@@uriLicense', info.licenseuri))
-        .pipe(replace('@@keywords', info.keywords))
-        .pipe(zip(`${info.name}.zip`))
+        .pipe(replace('@@author', pkg.author))
+        .pipe(replace('@@website', pkg.website))
+        .pipe(replace('@@version', pkg.version))
+        .pipe(replace('@@description', pkg.description))
+        .pipe(replace('@@license', pkg.license))
+        .pipe(replace('@@uriLicense', pkg.licenseuri))
+        .pipe(replace('@@keywords', pkg.keywords))
+        .pipe(zip(`${pkg.name}.zip`))
         .pipe(dest('./build'));
 };
 
@@ -116,10 +133,10 @@ export const pot = () => {
         .pipe(
             wpPot({
                 domain: '_themename',
-                package: info.name
+                package: pkg.name
             })
         )
-        .pipe(dest(`dist/languages/${info.name}.pot`));
+        .pipe(dest(`dist/languages/${pkg.name}.pot`));
 };
 
 // Watch
