@@ -104,7 +104,7 @@ rules:
 
     # Object
     object-curly-newline:
-        - 2
+        - 0
         - minProperties: 1
     object-curly-spacing: 2
     object-property-newline: 2
