@@ -1,7 +1,7 @@
 {
   "name": "gulp-wordpress",
   "version": "0.0.1",
-  "description": "This is a development environment for wordpress with gulp",
+  "description": "Automated WordPress Theme development environment run by Gulp using Sass, Babel, Webpack, linters and BrowserSync.",
   "main": "index.js",
   "scripts": {
     "start": "gulp",
@@ -11,13 +11,22 @@
     "type": "git",
     "url": "git+https://github.com/marcoris/gulp-wordpress.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "wordpress",
+    "theme",
+    "sass",
+    "babel",
+    "webpack",
+    "gulp",
+    "BrowserSync"
+  ],
+  "author": "Marco Ris",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/marcoris/gulp-wordpress/issues"
   },
   "homepage": "https://github.com/marcoris/gulp-wordpress#readme",
+  "website": "https://risdesign.ch",
   "devDependencies": {
     "@babel/core": "^7.8.4",
     "@babel/preset-env": "^7.8.4",
@@ -47,6 +56,7 @@
     "gulp-sourcemaps": "^2.6.5",
     "gulp-uglify": "^3.0.2",
     "gulp-util": "^3.0.8",
+    "gulp-wp-pot": "^2.3.6",
     "gulp-zip": "^5.0.1",
     "lodash.template": "^4.5.0",
     "vinyl-ftp": "^0.6.1",
