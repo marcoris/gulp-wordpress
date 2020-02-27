@@ -16,6 +16,7 @@ import named from 'vinyl-named';
 import browserSync from 'browser-sync';
 import zip from 'gulp-zip';
 import info from './package.json';
+import replace from 'gulp-replace';
 
 const PRODUCTION = yargs.argv.prod;
 const server = browserSync.create();
@@ -95,6 +96,10 @@ export const reload = done => {
 // Generate ZIP
 export const compress = () => {
     return src('dist/**/*')
+        .pipe(gulpif(
+            file => file.relative.split('.').pop() !== 'zip',
+            replace('_themename', info.name)
+        ))
         .pipe(zip(`${info.name}.zip`))
         .pipe(dest('.'));
 };
