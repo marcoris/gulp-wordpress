@@ -75,8 +75,14 @@ export const images = () => {
 
 // Copy
 export const copy = () => {
-    return src('src/**/*.{php,mo,po}')
+    return src('src/**/*.{php,mo,po,htaccess}')
         .pipe(dest('dist'));
+};
+
+// Copy production htaccess
+export const copyHtaccessProduction = () => {
+    return src('node_modules/apache-server-configs/dist/.htaccess')
+        .pipe(dest('dist/config'));
 };
 
 // Scripts
@@ -141,5 +147,5 @@ export const watchForChanges = () => {
 };
 
 export const dev = series(clean, parallel(styles, images, copy, scripts), serve, watchForChanges);
-export const build = series(clean, parallel(styles, images, copy, scripts), compress);
+export const build = series(clean, parallel(styles, images, copy, scripts), copyHtaccessProduction, compress);
 export default dev;
