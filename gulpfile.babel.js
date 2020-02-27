@@ -13,11 +13,14 @@ import imagemin from 'gulp-imagemin';
 import del from 'del';
 import webpack from 'webpack-stream';
 import named from 'vinyl-named';
+import browserSync from 'browser-sync';
+
 const PRODUCTION = yargs.argv.prod;
+const server = browserSync.create();
 
 // Styles
 export const styles = () => {
-    return src('src/scss/style.scss')
+    return src(['src/scss/style.scss', 'src/scss/admin.scss'])
         .pipe(gulpif(!PRODUCTION, sourcemaps.init()))
         .pipe(sass().on('error', sass.logError))
         .pipe(gulpif(PRODUCTION, postcss([autoprefixer])))
@@ -25,7 +28,8 @@ export const styles = () => {
             compatibility: 'ie8'
         })))
         .pipe(gulpif(!PRODUCTION, sourcemaps.write()))
-        .pipe(dest('dist/css'));
+        .pipe(dest('dist/css'))
+        .pipe(server.stream());
 };
 
 // Images
@@ -46,7 +50,7 @@ export const clean = () => del(['dist']);
 
 // Scripts
 export const scripts = () => {
-    return src(['src/js/bundle.js', 'src/js/admin.js'])
+    return src(['src/js/main.js', 'src/js/admin.js'])
         .pipe(named())
         .pipe(webpack({
             module: {
@@ -65,7 +69,7 @@ export const scripts = () => {
             mode: PRODUCTION ? 'production' : 'development',
             devtool: !PRODUCTION ? 'inline-source-map' : false, // eval
             output: {
-                filename: '[name].js'
+                filename: !PRODUCTION ? '[name].js' : '[name].min.js'
             },
             externals: {
                 jquery: 'jQuery'
@@ -74,14 +78,27 @@ export const scripts = () => {
         .pipe(dest('dist/js'));
 };
 
+// Browsersync
+export const serve = done => {
+    server.init({
+        proxy: 'http://localhost' // put your local website link here
+    });
+    done();
+};
+export const reload = done => {
+    server.reload();
+    done();
+};
+
 // Watch
 export const watchForChanges = () => {
     watch('src/scss/**/*.scss', styles);
-    watch('src/images/**/*.{jpg,jpeg,png,svg,gif}', images);
-    watch(['src/**/*', '!src/{images,js,scss}', '!src/{images,js,scss}/**/*'], copy);
-    watch('src/js/**/*.js', scripts);
+    watch('src/images/**/*.{jpg,jpeg,png,svg,gif}', series(images, reload));
+    watch(['src/**/*', '!src/{images,js,scss}', '!src/{images,js,scss}/**/*'], series(copy, reload));
+    watch('src/js/**/*.js', series(scripts, reload));
+    watch('**/*.php', reload);
 };
 
-export const dev = series(clean, parallel(styles, images, copy, scripts), watchForChanges);
+export const dev = series(clean, parallel(styles, images, copy, scripts), serve, watchForChanges);
 export const build = series(clean, parallel(styles, images, copy, scripts));
 export default dev;
