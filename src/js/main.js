@@ -1,6 +1,6 @@
 // bundle.js
-import './components/slider';
 import $ from 'jquery';
+import './components/slider';
 
 // slider.js
 console.log('bundle');
