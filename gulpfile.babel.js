@@ -75,7 +75,7 @@ export const images = () => {
 
 // Copy
 export const copy = () => {
-    return src('src/**/*.php')
+    return src('src/**/*.{php,mo,po}')
         .pipe(dest('dist'));
 };
 
@@ -113,8 +113,7 @@ export const scripts = () => {
 export const compress = () => {
     return src('dist/**/*')
         .pipe(gulpif(
-            file => file.relative.split('.').pop() !== 'zip',
-            replace('_themename', pkg.name)
+            file => file.relative.split('.').pop() !== 'zip', replace('_themename', pkg.name)
         ))
         .pipe(zip(`${pkg.name}.zip`))
         .pipe(dest('./build'));
@@ -122,14 +121,14 @@ export const compress = () => {
 
 // Generate POT
 export const makePot = () => {
-    return src('**/*.php')
+    return src('src/**/*.php')
         .pipe(
             wpPot({
                 domain: '_themename',
                 package: pkg.name
             })
         )
-        .pipe(dest(`dist/languages/${pkg.name}.pot`));
+        .pipe(dest(`src/languages/${pkg.name}.pot`));
 };
 
 // Watch
@@ -142,5 +141,5 @@ export const watchForChanges = () => {
 };
 
 export const dev = series(clean, parallel(styles, images, copy, scripts), serve, watchForChanges);
-export const build = series(clean, parallel(styles, images, copy, scripts), makePot, compress);
+export const build = series(clean, parallel(styles, images, copy, scripts), compress);
 export default dev;
