@@ -21,6 +21,7 @@ import prompt from 'gulp-prompt';
 import bumpVersion from 'gulp-bump';
 import conventionalChangelog from 'gulp-conventional-changelog';
 import notify from 'gulp-notify';
+import run from 'gulp-run';
 
 const PRODUCTION = yargs.argv.prod;
 const server = browserSync.create();
@@ -222,8 +223,14 @@ export const watchForChanges = () => {
     watch('**/*.php', reload);
 };
 
+// Release to github
+export const addRelease = () => {
+    return run('git add CHANGELOG.md README.md package.json && git commit --amend --no-edit && git tag v<%= pkg.version %> -m "Version <%= pkg.version %>" && git push && git push --tags').exec();
+};
+
 export const dev = series(clean, parallel(styles, images, copy, scripts), serve, watchForChanges);
 export const build = series(clean, parallel(styles, images, copy, scripts), copyHtaccessProduction, compress);
 export const bump = series(bumpPrompt);
 export const hint = series(showHint);
+export const release = series(addRelease);
 export default dev;
