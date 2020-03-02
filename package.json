@@ -1,6 +1,7 @@
 {
   "name": "gulp-wordpress",
   "version": "0.0.3",
+  "year": "2020",
   "description": "Automated WordPress Theme development environment run by Gulp using Sass, Babel, Webpack, linters and BrowserSync.",
   "main": "index.js",
   "scripts": {
@@ -70,6 +71,8 @@
     "yargs": "^15.1.0"
   },
   "dependencies": {
-    "jquery": "^3.4.1"
+    "bootstrap": "^4.4.1",
+    "jquery": "^3.4.1",
+    "popper.js": "^1.16.1"
   }
 }

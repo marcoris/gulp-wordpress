@@ -40,16 +40,18 @@ const reload = done => {
 
 // WordPress banner
 const comment = '/*\n' +
-' * Theme Name: <%= pkg.name %>\n' +
-' * Author: <%= pkg.author %>\n' +
-' * Author URI: <%= pkg.website %>\n' +
-' * Description: <%= pkg.description %>\n' +
-' * Version: <%= pkg.version %>\n' +
-' * License: <%= pkg.license %>\n' +
-' * License URI: <%= pkg.license_uri %>\n' +
-' * Text Domain: <%= pkg.name %>\n' +
-' * Tags: <%= pkg.keywords %>\n' +
-'*/\n\n';
+` * Theme Name: ${pkg.name}\n` +
+` * Author: ${pkg.author}\n` +
+` * Author URI: ${pkg.website}\n` +
+` * Description: ${pkg.description}\n` +
+` * Version: ${pkg.version}\n` +
+` * License: ${pkg.license}\n` +
+` * License URI: ${pkg.license_uri}\n` +
+` * Text Domain: ${pkg.name}\n` +
+` * Tags: ${pkg.keywords}\n` +
+` * Copyright: ${pkg.year} ${pkg.author}\n` +
+' * This stylesheet is not used by this WordPress site it only exists as reference for WordPress. The stylesheet in use can be found in this folder as style.min.{hash}.css\n' +
+'*/\n';
 
 // Clean
 export const clean = () => del(['dist', 'build']);
@@ -64,11 +66,17 @@ export const styles = () => {
             compatibility: 'ie8'
         })))
         .pipe(gulpif(!PRODUCTION, sourcemaps.write()))
+        .pipe(dest('dist/css'))
+        .pipe(server.stream());
+};
+
+// Add banner
+const addBanner = () => {
+    return src('src/php/style.css')
         .pipe(banner(comment, {
             pkg
         }))
-        .pipe(dest('dist/php'))
-        .pipe(server.stream());
+        .pipe(dest('dist/php'));
 };
 
 // Images
@@ -228,8 +236,8 @@ export const addRelease = () => {
     return run(`git add CHANGELOG.md README.md package.json && git commit --amend --no-edit && git tag v${pkg.version} -m "Version ${pkg.version}" && git push && git push --tags`).exec();
 };
 
-export const dev = series(clean, parallel(styles, images, copy, scripts), serve, watchForChanges);
-export const build = series(clean, parallel(styles, images, copy, scripts), copyHtaccessProduction, compress);
+export const dev = series(clean, parallel(styles, images, copy, scripts), addBanner, serve, watchForChanges);
+export const build = series(clean, parallel(styles, images, copy, scripts), addBanner, copyHtaccessProduction, compress);
 export const bump = series(bumpPrompt);
 export const hint = series(showHint);
 export const release = series(addRelease);
