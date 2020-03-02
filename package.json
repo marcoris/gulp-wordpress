@@ -1,6 +1,6 @@
 {
   "name": "gulp-wordpress",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Automated WordPress Theme development environment run by Gulp using Sass, Babel, Webpack, linters and BrowserSync.",
   "main": "index.js",
   "scripts": {
@@ -28,9 +28,9 @@
   "homepage": "https://github.com/marcoris/gulp-wordpress#readme",
   "website": "https://risdesign.ch",
   "devDependencies": {
-    "@babel/core": "^7.8.4",
-    "@babel/preset-env": "^7.8.4",
-    "@babel/register": "^7.8.3",
+    "@babel/core": "^7.8.6",
+    "@babel/preset-env": "^7.8.6",
+    "@babel/register": "^7.8.6",
     "apache-server-configs": "^3.2.1",
     "autoprefixer": "^9.7.4",
     "babel": "^6.23.0",
@@ -66,7 +66,8 @@
     "lodash.template": "^4.5.0",
     "vinyl-ftp": "^0.6.1",
     "vinyl-named": "^1.1.0",
-    "webpack-stream": "^5.2.1"
+    "webpack-stream": "^5.2.1",
+    "yargs": "^15.1.0"
   },
   "dependencies": {
     "jquery": "^3.4.1"
