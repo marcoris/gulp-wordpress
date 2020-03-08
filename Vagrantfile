@@ -1,6 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+FileUtils.mkdir_p './wwwroot'
+
 Vagrant.configure("2") do |config|
  
     # Box Settings

@@ -1,30 +1,35 @@
-// Initialize modules
+// Gulp plugins
 import {src, dest, watch, series, parallel} from 'gulp';
-import yargs from 'yargs';
-import sass from 'gulp-sass';
+import banner from 'gulp-banner';
+import bumpVersion from 'gulp-bump';
 import cleanCss from 'gulp-clean-css';
+import conventionalChangelog from 'gulp-conventional-changelog';
 import gulpif from 'gulp-if';
-import postcss from 'gulp-postcss';
-import sourcemaps from 'gulp-sourcemaps';
-import autoprefixer from 'autoprefixer';
 import imagemin from 'gulp-imagemin';
+import notify from 'gulp-notify';
+import postcss from 'gulp-postcss';
+import prompt from 'gulp-prompt';
+import replace from 'gulp-replace';
+import run from 'gulp-run';
+import sass from 'gulp-sass';
+import sourcemaps from 'gulp-sourcemaps';
+import wpPot from 'gulp-wp-pot';
+import zip from 'gulp-zip';
+
+// Other plugins
+import pkg from './package.json';
+import autoprefixer from 'autoprefixer';
 import del from 'del';
-import webpack from 'webpack-stream';
 import named from 'vinyl-named';
 import browserSync from 'browser-sync';
-import zip from 'gulp-zip';
-import pkg from './package.json';
-import replace from 'gulp-replace';
-import wpPot from 'gulp-wp-pot';
-import banner from 'gulp-banner';
-import prompt from 'gulp-prompt';
-import bumpVersion from 'gulp-bump';
-import conventionalChangelog from 'gulp-conventional-changelog';
-import notify from 'gulp-notify';
-import run from 'gulp-run';
+import webpack from 'webpack-stream';
+import yargs from 'yargs';
 
+// Configs
 const PRODUCTION = yargs.argv.prod;
 const server = browserSync.create();
+require('dotenv').config();
+const dist = `wwwroot/wp-content/themes/${pkg.name}`;
 
 // Browsersync
 const serve = done => {
@@ -54,7 +59,10 @@ const comment = '/*\n' +
 '*/\n';
 
 // Clean
-export const clean = () => del(['dist', 'build']);
+export const clean = () => del([dist, 'build']);
+
+// Clean all
+export const cleanall = () => del([dist, 'build', 'wwwroot']);
 
 // Styles
 export const styles = () => {
@@ -66,7 +74,7 @@ export const styles = () => {
             compatibility: 'ie8'
         })))
         .pipe(gulpif(!PRODUCTION, sourcemaps.write()))
-        .pipe(dest('dist/css'))
+        .pipe(dest(dist + '/assets/css'))
         .pipe(server.stream());
 };
 
@@ -76,20 +84,20 @@ const addBanner = () => {
         .pipe(banner(comment, {
             pkg
         }))
-        .pipe(dest('dist/php'));
+        .pipe(dest(dist));
 };
 
 // Images
 export const images = () => {
     return src('src/images/**/*.{jpg,jpeg,png,svg,gif}')
         .pipe(gulpif(PRODUCTION, imagemin()))
-        .pipe(dest('dist/images'));
+        .pipe(dest(dist + '/assets/images'));
 };
 
 // Copy
 export const copy = () => {
     return src('src/**/*.{php,mo,po,htaccess}')
-        .pipe(dest('dist'));
+        .pipe(dest(dist));
 };
 
 // Copy production htaccess
@@ -125,7 +133,7 @@ export const scripts = () => {
                 jquery: 'jQuery'
             }
         }))
-        .pipe(dest('dist/js'));
+        .pipe(dest(dist + '/assets/js'));
 };
 
 // Bump version x.x.1
@@ -236,6 +244,21 @@ export const addRelease = () => {
     return run(`git add CHANGELOG.md README.md package.json && git commit --amend --no-edit && git tag v${pkg.version} -m "Version ${pkg.version}" && git push && git push --tags`).exec();
 };
 
+// Run vagrant up and install its dependencies to work with WordPress
+const setupEnvironment = () => {
+    return run('vagrant up').exec();
+};
+
+// Sets the configuration
+const setConfig = () => {
+    return src('./wwwroot/wp-config.php')
+        .pipe(replace('database_name_here', process.env.LOCAL_DB_NAME))
+        .pipe(replace('username_here', process.env.LOCAL_DB_USER))
+        .pipe(replace('password_here', process.env.LOCAL_DB_PASS))
+        .pipe(dest('./wwwroot'));
+};
+
+export const setup = series(setupEnvironment, setConfig);
 export const dev = series(clean, parallel(styles, images, copy, scripts), addBanner, serve, watchForChanges);
 export const build = series(clean, parallel(styles, images, copy, scripts), addBanner, copyHtaccessProduction, compress);
 export const bump = series(bumpPrompt);
