@@ -7,7 +7,7 @@
 /**  MySQL Einstellungen - diese Angaben bekommst du von deinem Webhoster. */
 define('DB_NAME', '@@db_name');
 define('DB_USER', '@@db_user');
-define('DB_PASSWORD', '@@db_password');
+define('DB_PASSWORD', '@@db_pass');
 define('DB_HOST', '@@db_host');
 
 define('DB_CHARSET', 'utf8');
@@ -34,7 +34,7 @@ $table_prefix  = '@@db_prefix';
  * in their development environments.
  */
 define( 'WP_DEBUG', @@wp_debug );
-define( 'SAVEQUERIES', @@savequeries );
+define( 'SAVEQUERIES', @@save_queries );
 
 /**
  * Disallow File Mods

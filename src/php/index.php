@@ -8,27 +8,27 @@
             </a>
         </h2>
         <div>
-            <?php _themename_post_meta(); ?>
+            <?php gulpwordpress_post_meta(); ?>
         </div>
         <div>
             <?php the_excerpt(); ?>
         </diV>
-            <?php _themename_readmore_link(); ?> 
+            <?php gulpwordpress_readmore_link(); ?> 
     <?php } ?>
     <?php the_posts_pagination( ); ?>
 <?php } else { ?>
-    <p><?php esc_html_e('Sorry, no posts matched your criteria.', '_themename'); ?></p>
+    <p><?php esc_html_e('Sorry, no posts matched your criteria.', 'gulpwordpress'); ?></p>
 <?php } ?>    
 
 <?php
 
 $city = 'london';
 
-echo esc_html__( 'Your city is', '_themename' ) . $city;
+echo esc_html__( 'Your city is', 'gulpwordpress' ) . $city;
 
 printf(
     /* tanslators: %s is the city name */
-    esc_html__( 'Your city is %s', '_themename' ),
+    esc_html__( 'Your city is %s', 'gulpwordpress' ),
     $city
 );
 
