@@ -140,7 +140,15 @@ export const styles = () => {
     return src('src/scss/style.scss')
         .pipe(gulpif(!PRODUCTION, sourcemaps.init()))
         .pipe(sass().on('error', sass.logError))
-        .pipe(gulpif(PRODUCTION, postcss([autoprefixer])))
+        .pipe(gulpif(PRODUCTION, postcss([autoprefixer(
+            'last 2 versions',
+            '> 1%',
+            'safari 5',
+            'ie 8',
+            'ie 9',
+            'opera 12.1',
+            'ios 6',
+            'android 4' )])))
         .pipe(gulpif(PRODUCTION, cleanCss({
             compatibility: 'ie8'
         })))
