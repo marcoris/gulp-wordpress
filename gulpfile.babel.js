@@ -35,8 +35,8 @@ const dist = `wwwroot/wp-content/themes/${pkg.name}`;
 // Browsersync
 const serve = done => {
     server.init({
-        proxy: 'http://localhost',
-        port: '8080'
+        proxy: 'http://localhost:8080',
+        files: ['src/scss/**/*.scss', 'src/js/**/*.js']
     });
     done();
 };
@@ -202,9 +202,6 @@ export const scripts = () => {
             },
             mode: PRODUCTION ? 'production' : 'development',
             devtool: !PRODUCTION ? 'inline-source-map' : false, // eval
-            output: {
-                filename: !PRODUCTION ? '[name].js' : '[name].min.js'
-            },
             externals: {
                 jquery: 'jQuery'
             }
@@ -308,9 +305,9 @@ export const makepot = () => {
 
 // Watch
 export const watchForChanges = () => {
-    watch('src/scss/**/*.scss', styles);
+    watch('src/scss/**/*.scss', series(styles, reload));
     watch('src/js/**/*.js', series(scripts, reload));
-    watch('src/images/**/*.{jpg,jpeg,png,svg,gif}', series(images, reload));
+    watch('src/images/**/*.{jpg,jpeg,png,svg,gif}', series(images));
     watch('src/php/**/*.php', series(copyphp));
 };
 
