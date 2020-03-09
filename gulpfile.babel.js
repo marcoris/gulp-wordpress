@@ -4,6 +4,7 @@ import banner from 'gulp-banner';
 import bumpVersion from 'gulp-bump';
 import cleanCss from 'gulp-clean-css';
 import conventionalChangelog from 'gulp-conventional-changelog';
+import eslint from 'gulp-eslint';
 import gulpif from 'gulp-if';
 import imagemin from 'gulp-imagemin';
 import notify from 'gulp-notify';
@@ -12,6 +13,7 @@ import prompt from 'gulp-prompt';
 import replace from 'gulp-replace';
 import run from 'gulp-run';
 import sass from 'gulp-sass';
+import sassLint from 'gulp-sass-lint';
 import sourcemaps from 'gulp-sourcemaps';
 import wpPot from 'gulp-wp-pot';
 import zip from 'gulp-zip';
@@ -122,22 +124,61 @@ const setConfig = () => {
     keys = fs.readFileSync('keys.php', 'utf-8');
 
     return src('src/config/wp-config.php')
-        .pipe(replace('@@db_name', process.env.LOCAL_DB_NAME))
-        .pipe(replace('@@db_user', process.env.LOCAL_DB_USER))
-        .pipe(replace('@@db_pass', process.env.LOCAL_DB_PASS))
-        .pipe(replace('@@db_host', process.env.LOCAL_DB_HOST))
-        .pipe(replace('@@db_prefix', process.env.DB_PREFIX))
-        .pipe(replace('@@wp_debug', process.env.LOCAL_WP_DEBUG))
-        .pipe(replace('@@save_queries', process.env.LOCAL_SAVEQUERIES))
-        .pipe(replace('@@disallow_file_mods', process.env.LOCAL_DISALLOW_FILE_MODS))
-        .pipe(replace('@@wp_allow_multisite', process.env.LOCAL_WP_ALLOW_MULTISITE))
-        .pipe(replace('@@include', keys))
-        .pipe(dest('./wwwroot/'));
+        .pipe(prompt.prompt({
+            type: 'checkbox',
+            name: 'config',
+            message: 'Setup for?',
+            choices: ['local', 'staging', 'production']
+        }, function(res) {
+            if (res.config[0] == 'staging') {
+                src('src/config/wp-config.php')
+                    .pipe(replace('@@db_name', process.env.STAGE_DB_NAME))
+                    .pipe(replace('@@db_user', process.env.STAGE_DB_USER))
+                    .pipe(replace('@@db_pass', process.env.STAGE_DB_PASS))
+                    .pipe(replace('@@db_host', process.env.STAGE_DB_HOST))
+                    .pipe(replace('@@db_prefix', process.env.DB_PREFIX))
+                    .pipe(replace('@@wp_debug', process.env.STAGE_WP_DEBUG))
+                    .pipe(replace('@@save_queries', process.env.STAGE_SAVEQUERIES))
+                    .pipe(replace('@@disallow_file_mods', process.env.STAGE_DISALLOW_FILE_MODS))
+                    .pipe(replace('@@wp_allow_multisite', process.env.STAGE_WP_ALLOW_MULTISITE))
+                    .pipe(replace('@@include', keys))
+                    .pipe(dest('./wwwroot/'));
+            } else if (res.config[0] == 'production') {
+                src('src/config/wp-config.php')
+                    .pipe(replace('@@db_name', process.env.PRODUCTION_DB_NAME))
+                    .pipe(replace('@@db_user', process.env.PRODUCTION_DB_USER))
+                    .pipe(replace('@@db_pass', process.env.PRODUCTION_DB_PASS))
+                    .pipe(replace('@@db_host', process.env.PRODUCTION_DB_HOST))
+                    .pipe(replace('@@db_prefix', process.env.DB_PREFIX))
+                    .pipe(replace('@@wp_debug', process.env.PRODUCTION_WP_DEBUG))
+                    .pipe(replace('@@save_queries', process.env.PRODUCTION_SAVEQUERIES))
+                    .pipe(replace('@@disallow_file_mods', process.env.PRODUCTION_DISALLOW_FILE_MODS))
+                    .pipe(replace('@@wp_allow_multisite', process.env.PRODUCTION_WP_ALLOW_MULTISITE))
+                    .pipe(replace('@@include', keys))
+                    .pipe(dest('./wwwroot/'));
+            } else {
+                src('src/config/wp-config.php')
+                    .pipe(replace('@@db_name', process.env.LOCAL_DB_NAME))
+                    .pipe(replace('@@db_user', process.env.LOCAL_DB_USER))
+                    .pipe(replace('@@db_pass', process.env.LOCAL_DB_PASS))
+                    .pipe(replace('@@db_host', process.env.LOCAL_DB_HOST))
+                    .pipe(replace('@@db_prefix', process.env.DB_PREFIX))
+                    .pipe(replace('@@wp_debug', process.env.LOCAL_WP_DEBUG))
+                    .pipe(replace('@@save_queries', process.env.LOCAL_SAVEQUERIES))
+                    .pipe(replace('@@disallow_file_mods', process.env.LOCAL_DISALLOW_FILE_MODS))
+                    .pipe(replace('@@wp_allow_multisite', process.env.LOCAL_WP_ALLOW_MULTISITE))
+                    .pipe(replace('@@include', keys))
+                    .pipe(dest('./wwwroot/'));
+            }
+        }));
 };
 
 // Styles
 export const styles = () => {
     return src('src/scss/style.scss')
+        .pipe(sassLint())
+        .pipe(sassLint.format())
+        .pipe(sassLint.failOnError())
         .pipe(gulpif(!PRODUCTION, sourcemaps.init()))
         .pipe(sass().on('error', sass.logError))
         .pipe(gulpif(PRODUCTION, postcss([autoprefixer(
@@ -193,6 +234,9 @@ export const copyHtaccessProduction = () => {
 // Scripts
 export const scripts = () => {
     return src(['src/js/main.js', 'src/js/admin.js'])
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError())
         .pipe(named())
         .pipe(webpack({
             module: {
