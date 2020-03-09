@@ -110,3 +110,4 @@ wwwroot/*
 
 .vagrant/*
 keys.php
+vendor/*
