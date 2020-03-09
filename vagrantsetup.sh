@@ -36,6 +36,11 @@ rm latest.tar.gz
 sudo rsync -av wordpress/* /var/www/html/
 rm -R wordpress
 
+# Install wp cli
+curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+chmod +x wp-cli.phar
+sudo mv wp-cli.phar /usr/local/bin/wp
+
 # Set permissions
 sudo chown -R www-data:www-data /var/www/html/
 sudo chmod -R 755 /var/www/html/
