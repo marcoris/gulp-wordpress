@@ -109,3 +109,4 @@ dist
 wwwroot/*
 
 .vagrant/*
+keys.php

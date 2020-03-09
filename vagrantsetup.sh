@@ -35,7 +35,6 @@ tar -xzvf latest.tar.gz
 rm latest.tar.gz
 sudo rsync -av wordpress/* /var/www/html/
 rm -R wordpress
-rm /var/www/html/index.html
 
 # Set permissions
 sudo chown -R www-data:www-data /var/www/html/

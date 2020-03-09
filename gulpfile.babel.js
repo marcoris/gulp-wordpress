@@ -24,6 +24,7 @@ import named from 'vinyl-named';
 import browserSync from 'browser-sync';
 import webpack from 'webpack-stream';
 import yargs from 'yargs';
+import fs from 'fs';
 
 // Configs
 const PRODUCTION = yargs.argv.prod;
@@ -34,7 +35,8 @@ const dist = `wwwroot/wp-content/themes/${pkg.name}`;
 // Browsersync
 const serve = done => {
     server.init({
-        proxy: 'http://localhost'
+        proxy: 'http://localhost',
+        port: '8080'
     });
     done();
 };
@@ -63,6 +65,75 @@ export const clean = () => del([dist, 'build']);
 
 // Clean all
 export const cleanall = () => del([dist, 'build', 'wwwroot']);
+
+// Run vagrant up and install its dependencies to work with WordPress
+const setupEnvironment = () => {
+    if (fs.existsSync('.env_template')) {
+        if (!fs.existsSync('.env')) {
+            return src('.env_template')
+                .pipe(run('cp .env_template .env'))
+                .pipe(prompt.prompt([{
+                    type: 'input',
+                    name: 'hosting',
+                    message: 'Hostname: 1ahosting?',
+                    default: '1ahosting'
+                },
+                {
+                    type: 'input',
+                    name: 'user',
+                    message: 'Hostinguser?',
+                    default: 'risdesign'
+                },
+                {
+                    type: 'input',
+                    name: 'wpversion',
+                    message: 'WordPress version?',
+                    default: '5.3.2'
+                },
+                {
+                    type: 'input',
+                    name: 'acf',
+                    message: 'ACF Pro key?',
+                    default: ''
+                }], function(res) {
+                    //value is in res.first and res.second
+                    return src('.env')
+                        .pipe(replace('hostinguser', res.user))
+                        .pipe(replace('hosting', res.hosting))
+                        .pipe(replace('acfpro', res.acf))
+                        .pipe(replace('wpversion', res.wpversion))
+                        .pipe(dest('.'));
+                }));
+        }
+
+        return src('.env')
+            .pipe(run('echo .env already exists'));
+    }
+
+    return src('.env')
+        .pipe(run('echo .env_template does not exist!'));
+};
+
+// Sets the configuration
+const setConfig = () => {
+    var cmd = new run.Command('sh getKeys.sh');
+    cmd.exec();
+    var keys = '';
+    keys = fs.readFileSync('keys.php', 'utf-8');
+
+    return src('src/config/wp-config.php')
+        .pipe(replace('@@db_name', process.env.LOCAL_DB_NAME))
+        .pipe(replace('@@db_user', process.env.LOCAL_DB_USER))
+        .pipe(replace('@@db_pass', process.env.LOCAL_DB_PASS))
+        .pipe(replace('@@db_host', process.env.LOCAL_DB_HOST))
+        .pipe(replace('@@db_prefix', process.env.DB_PREFIX))
+        .pipe(replace('@@wp_debug', process.env.LOCAL_WP_DEBUG))
+        .pipe(replace('@@save_queries', process.env.LOCAL_SAVEQUERIES))
+        .pipe(replace('@@disallow_file_mods', process.env.LOCAL_DISALLOW_FILE_MODS))
+        .pipe(replace('@@wp_allow_multisite', process.env.LOCAL_WP_ALLOW_MULTISITE))
+        .pipe(replace('@@include', keys))
+        .pipe(dest('./wwwroot/'));
+};
 
 // Styles
 export const styles = () => {
@@ -96,14 +167,19 @@ export const images = () => {
 
 // Copy
 export const copy = () => {
-    return src('src/**/*.{php,mo,po,htaccess}')
+    return src('src/**/*.{mo,po,htaccess}')
+        .pipe(dest(dist));
+};
+
+const copyphp = () => {
+    return src('src/php/**/*.php')
         .pipe(dest(dist));
 };
 
 // Copy production htaccess
 export const copyHtaccessProduction = () => {
     return src('node_modules/apache-server-configs/dist/.htaccess')
-        .pipe(dest('dist/config'));
+        .pipe(dest('wwwroot'));
 };
 
 // Scripts
@@ -210,7 +286,7 @@ export const bumpPrompt = () => {
 
 // Generate ZIP
 export const compress = () => {
-    return src('dist/**/*')
+    return src(dist)
         .pipe(gulpif(
             file => file.relative.split('.').pop() !== 'zip', replace('_themename', pkg.name)
         ))
@@ -219,24 +295,23 @@ export const compress = () => {
 };
 
 // Generate POT
-export const makePot = () => {
-    return src('src/**/*.php')
+export const makepot = () => {
+    return src('src/php/**/*.php')
         .pipe(
             wpPot({
                 domain: '_themename',
                 package: pkg.name
             })
         )
-        .pipe(dest(`src/languages/${pkg.name}.pot`));
+        .pipe(dest(`${dist}/languages/${pkg.name}.pot`));
 };
 
 // Watch
 export const watchForChanges = () => {
     watch('src/scss/**/*.scss', styles);
-    watch('src/images/**/*.{jpg,jpeg,png,svg,gif}', series(images, reload));
-    watch(['src/**/*', '!src/{images,js,scss}', '!src/{images,js,scss}/**/*'], series(copy, reload));
     watch('src/js/**/*.js', series(scripts, reload));
-    watch('**/*.php', reload);
+    watch('src/images/**/*.{jpg,jpeg,png,svg,gif}', series(images, reload));
+    watch('src/php/**/*.php', series(copyphp));
 };
 
 // Release to github
@@ -244,23 +319,10 @@ export const addRelease = () => {
     return run(`git add CHANGELOG.md README.md package.json && git commit --amend --no-edit && git tag v${pkg.version} -m "Version ${pkg.version}" && git push && git push --tags`).exec();
 };
 
-// Run vagrant up and install its dependencies to work with WordPress
-const setupEnvironment = () => {
-    return run('vagrant up').exec();
-};
-
-// Sets the configuration
-const setConfig = () => {
-    return src('./wwwroot/wp-config.php')
-        .pipe(replace('database_name_here', process.env.LOCAL_DB_NAME))
-        .pipe(replace('username_here', process.env.LOCAL_DB_USER))
-        .pipe(replace('password_here', process.env.LOCAL_DB_PASS))
-        .pipe(dest('./wwwroot'));
-};
-
 export const setup = series(setupEnvironment, setConfig);
-export const dev = series(clean, parallel(styles, images, copy, scripts), addBanner, serve, watchForChanges);
-export const build = series(clean, parallel(styles, images, copy, scripts), addBanner, copyHtaccessProduction, compress);
+export const dev = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, serve, watchForChanges);
+export const build = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyHtaccessProduction);
+export const buildzip = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyHtaccessProduction, compress);
 export const bump = series(bumpPrompt);
 export const hint = series(showHint);
 export const release = series(addRelease);
