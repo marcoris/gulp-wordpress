@@ -233,9 +233,15 @@ const copyphp = () => {
 };
 
 // Copy production htaccess
-export const copyHtaccessProduction = () => {
+const copyHtaccessProduction = () => {
     return src('node_modules/apache-server-configs/dist/.htaccess')
-        .pipe(dest('wwwroot'));
+        .pipe(dest(wwwroot));
+};
+
+// Copy glugins
+export const copyplugins = () => {
+    return src(root + '/plugins/**/*')
+        .pipe(dest(wwwroot + '/wp-content/plugins'));
 };
 
 // Scripts
@@ -270,7 +276,7 @@ export const scripts = () => {
 };
 
 // Bump version x.x.1
-export const bumpPatch = () => {
+const bumpPatch = () => {
     return src(['./package.json', './README.md'])
         .pipe(bumpVersion({
             type: 'patch'
@@ -279,7 +285,7 @@ export const bumpPatch = () => {
 };
 
 // Bump version x.1.x
-export const bumpMinor = () => {
+const bumpMinor = () => {
     return src(['./package.json', './README.md'])
         .pipe(bumpVersion({
             type: 'minor'
@@ -288,7 +294,7 @@ export const bumpMinor = () => {
 };
 
 // Bump version 1.x.x
-export const bumpMajor = () => {
+const bumpMajor = () => {
     return src(['./package.json', './README.md'])
         .pipe(bumpVersion({
             type: 'major'
@@ -372,7 +378,7 @@ export const watchForChanges = () => {
 };
 
 // Release to github
-export const addRelease = () => {
+const addRelease = () => {
     return run(`git add CHANGELOG.md README.md package.json && git commit --amend --no-edit && git tag v${pkg.version} -m "Version ${pkg.version}" && git push && git push --tags`).exec();
 };
 
@@ -381,10 +387,9 @@ export const docs = () => {
 };
 
 export const setup = series(setupEnvironment, setConfig);
-export const dev = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, serve, watchForChanges);
-export const build = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyHtaccessProduction, docs);
-export const buildDirzip = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyHtaccessProduction, compress);
+export const dev = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyplugins, docs, serve, watchForChanges);
+export const build = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyplugins, copyHtaccessProduction, docs);
+export const buildzip = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyHtaccessProduction, compress);
 export const bump = series(bumpPrompt);
-export const hint = series(showHint);
 export const release = series(addRelease);
 export default dev;
