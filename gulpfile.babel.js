@@ -10,6 +10,7 @@ import imagemin from 'gulp-imagemin';
 import notify from 'gulp-notify';
 import postcss from 'gulp-postcss';
 import prompt from 'gulp-prompt';
+import rename from 'gulp-rename';
 import replace from 'gulp-replace';
 import run from 'gulp-run';
 import sass from 'gulp-sass';
@@ -32,13 +33,16 @@ import fs from 'fs';
 const PRODUCTION = yargs.argv.prod;
 const server = browserSync.create();
 require('dotenv').config();
-const dist = `wwwroot/wp-content/themes/${pkg.name}`;
+const dist = `wwwroot/wp-content/themes/${pkg.name}`,
+    root = 'src',
+    wwwroot = 'wwwroot',
+    buildDir = 'build';
 
 // Browsersync
 const serve = done => {
     server.init({
         proxy: 'http://localhost:8080',
-        files: ['src/scss/**/*.scss', 'src/js/**/*.js']
+        files: [root + '/scss/**/*.scss', root + '/js/**/*.js']
     });
     done();
 };
@@ -63,13 +67,16 @@ const comment = '/*\n' +
 '*/\n';
 
 // Clean
-export const clean = () => del([dist, 'build']);
+export const clean = () => del([dist, buildDir]);
 
 // Clean all
-export const cleanall = () => del([dist, 'build', 'wwwroot']);
+export const cleanall = () => del([dist, buildDir, wwwroot]);
 
 // Run vagrant up and install its dependencies to work with WordPress
 const setupEnvironment = () => {
+    src(root + '/config/config.nucleus.json')
+        .pipe(replace('@@themename', pkg.name))
+        .pipe(dest('.'));
     if (fs.existsSync('.env_template')) {
         if (!fs.existsSync('.env')) {
             return src('.env_template')
@@ -84,7 +91,7 @@ const setupEnvironment = () => {
                     type: 'input',
                     name: 'user',
                     message: 'Hostinguser?',
-                    default: 'risdesign'
+                    default: pkg.name
                 },
                 {
                     type: 'input',
@@ -120,10 +127,9 @@ const setupEnvironment = () => {
 const setConfig = () => {
     var cmd = new run.Command('sh getKeys.sh');
     cmd.exec();
-    var keys = '';
-    keys = fs.readFileSync('keys.php', 'utf-8');
+    var keys = fs.readFileSync('keys.php', 'utf-8');
 
-    return src('src/config/wp-config.php')
+    return src(root + '/config/wp-config.php')
         .pipe(prompt.prompt({
             type: 'checkbox',
             name: 'config',
@@ -131,7 +137,7 @@ const setConfig = () => {
             choices: ['local', 'staging', 'production']
         }, function(res) {
             if (res.config[0] == 'staging') {
-                src('src/config/wp-config.php')
+                src(root + '/config/wp-config.php')
                     .pipe(replace('@@db_name', process.env.STAGE_DB_NAME))
                     .pipe(replace('@@db_user', process.env.STAGE_DB_USER))
                     .pipe(replace('@@db_pass', process.env.STAGE_DB_PASS))
@@ -142,9 +148,9 @@ const setConfig = () => {
                     .pipe(replace('@@disallow_file_mods', process.env.STAGE_DISALLOW_FILE_MODS))
                     .pipe(replace('@@wp_allow_multisite', process.env.STAGE_WP_ALLOW_MULTISITE))
                     .pipe(replace('@@include', keys))
-                    .pipe(dest('./wwwroot/'));
+                    .pipe(dest(wwwroot));
             } else if (res.config[0] == 'production') {
-                src('src/config/wp-config.php')
+                src(root + '/config/wp-config.php')
                     .pipe(replace('@@db_name', process.env.PRODUCTION_DB_NAME))
                     .pipe(replace('@@db_user', process.env.PRODUCTION_DB_USER))
                     .pipe(replace('@@db_pass', process.env.PRODUCTION_DB_PASS))
@@ -155,9 +161,9 @@ const setConfig = () => {
                     .pipe(replace('@@disallow_file_mods', process.env.PRODUCTION_DISALLOW_FILE_MODS))
                     .pipe(replace('@@wp_allow_multisite', process.env.PRODUCTION_WP_ALLOW_MULTISITE))
                     .pipe(replace('@@include', keys))
-                    .pipe(dest('./wwwroot/'));
+                    .pipe(dest(wwwroot));
             } else {
-                src('src/config/wp-config.php')
+                src(root + '/config/wp-config.php')
                     .pipe(replace('@@db_name', process.env.LOCAL_DB_NAME))
                     .pipe(replace('@@db_user', process.env.LOCAL_DB_USER))
                     .pipe(replace('@@db_pass', process.env.LOCAL_DB_PASS))
@@ -168,14 +174,14 @@ const setConfig = () => {
                     .pipe(replace('@@disallow_file_mods', process.env.LOCAL_DISALLOW_FILE_MODS))
                     .pipe(replace('@@wp_allow_multisite', process.env.LOCAL_WP_ALLOW_MULTISITE))
                     .pipe(replace('@@include', keys))
-                    .pipe(dest('./wwwroot/'));
+                    .pipe(dest(wwwroot));
             }
         }));
 };
 
 // Styles
 export const styles = () => {
-    return src('src/scss/style.scss')
+    return src(root + '/scss/style.scss')
         .pipe(sassLint())
         .pipe(sassLint.format())
         .pipe(sassLint.failOnError())
@@ -194,13 +200,14 @@ export const styles = () => {
             compatibility: 'ie8'
         })))
         .pipe(gulpif(!PRODUCTION, sourcemaps.write()))
+        .pipe(rename('style.min.css'))
         .pipe(dest(dist + '/assets/css'))
         .pipe(server.stream());
 };
 
 // Add banner
 const addBanner = () => {
-    return src('src/php/style.css')
+    return src(root + '/config/style.css')
         .pipe(banner(comment, {
             pkg
         }))
@@ -209,19 +216,19 @@ const addBanner = () => {
 
 // Images
 export const images = () => {
-    return src('src/images/**/*.{jpg,jpeg,png,svg,gif}')
+    return src(root + '/images/**/*.{jpg,jpeg,png,svg,gif}')
         .pipe(gulpif(PRODUCTION, imagemin()))
         .pipe(dest(dist + '/assets/images'));
 };
 
 // Copy
 export const copy = () => {
-    return src('src/**/*.{mo,po,htaccess}')
+    return src(root + '/**/*.{mo,po,htaccess}')
         .pipe(dest(dist));
 };
 
 const copyphp = () => {
-    return src('src/php/**/*.php')
+    return src(root + '/php/**/*.php')
         .pipe(dest(dist));
 };
 
@@ -233,7 +240,7 @@ export const copyHtaccessProduction = () => {
 
 // Scripts
 export const scripts = () => {
-    return src(['src/js/main.js', 'src/js/admin.js'])
+    return src(root + '/js/**/*.js')
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failAfterError())
@@ -258,6 +265,7 @@ export const scripts = () => {
                 jquery: 'jQuery'
             }
         }))
+        .pipe(rename('main.min.js'))
         .pipe(dest(dist + '/assets/js'));
 };
 
@@ -340,12 +348,12 @@ export const compress = () => {
             file => file.relative.split('.').pop() !== 'zip', replace('_themename', pkg.name)
         ))
         .pipe(zip(`${pkg.name}.zip`))
-        .pipe(dest('./build'));
+        .pipe(dest(buildDir));
 };
 
 // Generate POT
 export const makepot = () => {
-    return src('src/php/**/*.php')
+    return src(root + '/php/**/*.php')
         .pipe(
             wpPot({
                 domain: '_themename',
@@ -357,10 +365,10 @@ export const makepot = () => {
 
 // Watch
 export const watchForChanges = () => {
-    watch('src/scss/**/*.scss', series(styles, reload));
-    watch('src/js/**/*.js', series(scripts, reload));
-    watch('src/images/**/*.{jpg,jpeg,png,svg,gif}', series(images));
-    watch('src/php/**/*.php', series(copyphp));
+    watch(root + '/scss/**/*.scss', series(styles, reload));
+    watch(root + '/js/**/*.js', series(scripts, reload));
+    watch(root + '/images/**/*.{jpg,jpeg,png,svg,gif}', series(images));
+    watch(root + '/php/**/*.php', series(copyphp));
 };
 
 // Release to github
@@ -368,10 +376,14 @@ export const addRelease = () => {
     return run(`git add CHANGELOG.md README.md package.json && git commit --amend --no-edit && git tag v${pkg.version} -m "Version ${pkg.version}" && git push && git push --tags`).exec();
 };
 
+export const docs = () => {
+    return run(`nucleus --files ./${root}/scss/**/*.scss --target ./${dist}/styleguide --template=${root}/config/nucleus/`).exec();
+};
+
 export const setup = series(setupEnvironment, setConfig);
 export const dev = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, serve, watchForChanges);
-export const build = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyHtaccessProduction);
-export const buildzip = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyHtaccessProduction, compress);
+export const build = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyHtaccessProduction, docs);
+export const buildDirzip = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyHtaccessProduction, compress);
 export const bump = series(bumpPrompt);
 export const hint = series(showHint);
 export const release = series(addRelease);

@@ -1,0 +1,13 @@
+{
+    "title": "RisDesign",
+    "files": [
+        "src/scss/**/*.scss"
+    ],
+    "target": "wwwroot/wp-content/themes/@@themename/styleguide",
+    "css": "wwwroot/wp-content/themes/@@themename/assets/css/style.min.css",
+    "namespace": "page",
+    "verbose": 3,
+    "counterCSS": null,
+    "staticLipsum": false,
+    "placeholderService": false
+}

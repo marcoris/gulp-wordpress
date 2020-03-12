@@ -111,3 +111,4 @@ wwwroot/*
 .vagrant/*
 keys.php
 vendor/*
+config.nucleus.json
