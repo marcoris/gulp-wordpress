@@ -27,6 +27,12 @@ else
     # Remove origin to make it independent
     git remote rm origin
     git remote add origin https://github.com/marcoris/$projectname.git
+    # Delete README.md and CHANGELOG.md
+    rm README.md
+    rm CHANGELOG.md
+    # Create new README.md and CHANGELOG.md
+    touch README.md
+    touch CHANGELOG.md
     # Delete local tags.
     git tag -d $(git tag -l)
     # Fetch remote tags.
