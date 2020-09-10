@@ -62,6 +62,8 @@ fi
     - This installs an ubuntu on a VirtualBox and all needed packages for an apache and a SQL webserver
 - run `gulp setup`
 - fill in all necessary data
+- run `gulp`
+- happy coding
 
 ## Commands
 | command | description |
@@ -72,3 +74,7 @@ fi
 | gulp buildZip | Cleans directory, run styles, images, copy, scripts, addBanner, and zipt the project for ulpoad |
 | gulp bump | Gives a bump version prompt to choose between patch, minor and major |
 | gulp release | Adds the bumped files, commit them with a release message and push them to github |
+
+## TODOs
+* Remove the Vagrant stuff and add docker stuff
+* DB migrating script
