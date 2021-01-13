@@ -1,7 +1,9 @@
 // Gulp plugins
 import {src, dest, watch, series, parallel} from 'gulp';
+import babel from 'gulp-babel';
 import banner from 'gulp-banner';
 import bumpVersion from 'gulp-bump';
+import concat from 'gulp-concat';
 import cleanCss from 'gulp-clean-css';
 import conventionalChangelog from 'gulp-conventional-changelog';
 import eslint from 'gulp-eslint';
@@ -16,16 +18,16 @@ import run from 'gulp-run';
 import sass from 'gulp-sass';
 import sassLint from 'gulp-sass-lint';
 import sourcemaps from 'gulp-sourcemaps';
+import uglify from 'gulp-uglify';
 import wpPot from 'gulp-wp-pot';
 import zip from 'gulp-zip';
 
 // Other plugins
+import Rsync from 'rsync';
 import pkg from './package.json';
 import autoprefixer from 'autoprefixer';
 import del from 'del';
-import named from 'vinyl-named';
 import browserSync from 'browser-sync';
-import webpack from 'webpack-stream';
 import yargs from 'yargs';
 import fs from 'fs';
 
@@ -42,7 +44,7 @@ const dist = `wwwroot/wp-content/themes/${pkg.name}`,
 const serve = done => {
     server.init({
         proxy: 'http://localhost:8080',
-        files: [root + '/scss/**/*.scss', root + '/js/**/*.js']
+        files: [`${root}/scss/**/*.scss`, `${root}/js/**/*.js`]
     });
     done();
 };
@@ -74,7 +76,7 @@ export const cleanall = () => del([dist, buildDir, wwwroot]);
 
 // Run vagrant up and install its dependencies to work with WordPress
 const setupEnvironment = () => {
-    src(root + '/config/config.nucleus.json')
+    src(`${root}/config/config.nucleus.json`)
         .pipe(replace('@@themename', pkg.name))
         .pipe(dest('.'));
     if (fs.existsSync('.env_template')) {
@@ -89,7 +91,7 @@ const setupEnvironment = () => {
                 },
                 {
                     type: 'input',
-                    name: 'user',
+                    name: 'hostinguser',
                     message: 'Hostinguser?',
                     default: pkg.name
                 },
@@ -101,15 +103,22 @@ const setupEnvironment = () => {
                 },
                 {
                     type: 'input',
-                    name: 'acf',
+                    name: 'acfversion',
+                    message: 'ACF Pro version?',
+                    default: '5.6.7'
+                },
+                {
+                    type: 'input',
+                    name: 'acfpro',
                     message: 'ACF Pro key?',
                     default: ''
                 }], function(res) {
                     //value is in res.first and res.second
                     return src('.env')
-                        .pipe(replace('hostinguser', res.user))
+                        .pipe(replace('hostinguser', res.hostinguser))
                         .pipe(replace('hosting', res.hosting))
-                        .pipe(replace('acfpro', res.acf))
+                        .pipe(replace('acfpro', res.acfpro))
+                        .pipe(replace('acfversion', res.acfversion))
                         .pipe(replace('wpversion', res.wpversion))
                         .pipe(dest('.'));
                 }));
@@ -129,7 +138,7 @@ const setConfig = () => {
     cmd.exec();
     var keys = fs.readFileSync('keys.php', 'utf-8');
 
-    return src(root + '/config/wp-config.php')
+    return src(`${root}/config/wp-config.php`)
         .pipe(prompt.prompt({
             type: 'checkbox',
             name: 'config',
@@ -137,7 +146,7 @@ const setConfig = () => {
             choices: ['local', 'staging', 'production']
         }, function(res) {
             if (res.config[0] == 'staging') {
-                src(root + '/config/wp-config.php')
+                src(`${root}/config/wp-config.php`)
                     .pipe(replace('@@db_name', process.env.STAGE_DB_NAME))
                     .pipe(replace('@@db_user', process.env.STAGE_DB_USER))
                     .pipe(replace('@@db_pass', process.env.STAGE_DB_PASS))
@@ -150,7 +159,7 @@ const setConfig = () => {
                     .pipe(replace('@@include', keys))
                     .pipe(dest(wwwroot));
             } else if (res.config[0] == 'production') {
-                src(root + '/config/wp-config.php')
+                src(`${root}/config/wp-config.php`)
                     .pipe(replace('@@db_name', process.env.PRODUCTION_DB_NAME))
                     .pipe(replace('@@db_user', process.env.PRODUCTION_DB_USER))
                     .pipe(replace('@@db_pass', process.env.PRODUCTION_DB_PASS))
@@ -163,7 +172,7 @@ const setConfig = () => {
                     .pipe(replace('@@include', keys))
                     .pipe(dest(wwwroot));
             } else {
-                src(root + '/config/wp-config.php')
+                src(`${root}/config/wp-config.php`)
                     .pipe(replace('@@db_name', process.env.LOCAL_DB_NAME))
                     .pipe(replace('@@db_user', process.env.LOCAL_DB_USER))
                     .pipe(replace('@@db_pass', process.env.LOCAL_DB_PASS))
@@ -179,9 +188,18 @@ const setConfig = () => {
         }));
 };
 
+// Create composer.json with acf pro key to download wordpress plugins
+const setComposerfile = () => {
+    return src('composer_template.json')
+        .pipe(replace('@@acf_version', process.env.ACF_VERSION))
+        .pipe(replace('@@acf_pro_key', process.env.ACF_PRO_KEY))
+        .pipe(rename('composer.json'))
+        .pipe(dest('.'));
+};
+
 // Styles
 export const styles = () => {
-    return src(root + '/scss/style.scss')
+    return src(`${root}/scss/style.scss`)
         .pipe(sassLint())
         .pipe(sassLint.format())
         .pipe(sassLint.failOnError())
@@ -201,13 +219,13 @@ export const styles = () => {
         })))
         .pipe(gulpif(!PRODUCTION, sourcemaps.write()))
         .pipe(rename('style.min.css'))
-        .pipe(dest(dist + '/assets/css'))
+        .pipe(dest(`${dist}/assets/css`))
         .pipe(server.stream());
 };
 
 // Add banner
 const addBanner = () => {
-    return src(root + '/config/style.css')
+    return src(`${root}/config/style.css`)
         .pipe(banner(comment, {
             pkg
         }))
@@ -216,19 +234,24 @@ const addBanner = () => {
 
 // Images
 export const images = () => {
-    return src(root + '/images/**/*.{jpg,jpeg,png,svg,gif}')
+    return src(`${root}/images/**/*.{jpg,jpeg,png,svg,gif}`)
         .pipe(gulpif(PRODUCTION, imagemin()))
-        .pipe(dest(dist + '/assets/images'));
+        .pipe(dest(`${dist}/assets/images`));
 };
 
 // Copy
 export const copy = () => {
-    return src(root + '/**/*.{mo,po,htaccess}')
+    return src(`${root}/**/*.{mo,po,htaccess}`)
         .pipe(dest(dist));
 };
 
 const copyphp = () => {
-    return src(root + '/php/**/*.php')
+    return src(`${root}/php/**/*.php`)
+        .pipe(dest(dist));
+};
+
+const copyLanguage = () => {
+    return src(`${root}/languages/*.{mo,po}`)
         .pipe(dest(dist));
 };
 
@@ -240,39 +263,22 @@ const copyHtaccessProduction = () => {
 
 // Copy glugins
 export const copyplugins = () => {
-    return src(root + '/plugins/**/*')
-        .pipe(dest(wwwroot + '/wp-content/plugins'));
+    return src(`${root}/plugins/**/*`)
+        .pipe(dest(`${wwwroot}/wp-content/plugins`));
 };
 
 // Scripts
 export const scripts = () => {
-    return src(root + '/js/**/*.js')
+    return src(`${root}/js/**/*.js`)
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failAfterError())
-        .pipe(named())
-        .pipe(webpack({
-            module: {
-                rules: [
-                    {
-                        test: /\.js$/,
-                        use: {
-                            loader: 'babel-loader',
-                            options: {
-                                presets: ['@babel/preset-env']
-                            }
-                        }
-                    }
-                ]
-            },
-            mode: PRODUCTION ? 'production' : 'development',
-            devtool: !PRODUCTION ? 'inline-source-map' : false, // eval
-            externals: {
-                jquery: 'jQuery'
-            }
+        .pipe(concat('main.min.js'))
+        .pipe(babel({
+            presets: ['@babel/env']
         }))
-        .pipe(rename('main.min.js'))
-        .pipe(dest(dist + '/assets/js'));
+        .pipe(gulpif(PRODUCTION, uglify()))
+        .pipe(dest(`${dist}/assets/js`));
 };
 
 // Bump version x.x.1
@@ -359,22 +365,29 @@ export const compress = () => {
 
 // Generate POT
 export const makepot = () => {
-    return src(root + '/php/**/*.php')
+    return src(`${root}/php/**/*.php`)
         .pipe(
             wpPot({
-                domain: '_themename',
+                domain: 'gulpwordpress',
                 package: pkg.name
             })
         )
-        .pipe(dest(`${dist}/languages/${pkg.name}.pot`));
+        .pipe(dest(`${root}/languages/${pkg.name}.pot`));
+};
+
+// Rename textdomain in all php files
+export const renameTextdomain = () => {
+    return src(`${root}/php/**/*.php`)
+        .pipe(replace('gulpwordpress', pkg.name))
+        .pipe(dest(dist));
 };
 
 // Watch
 export const watchForChanges = () => {
-    watch(root + '/scss/**/*.scss', series(styles, reload));
-    watch(root + '/js/**/*.js', series(scripts, reload));
-    watch(root + '/images/**/*.{jpg,jpeg,png,svg,gif}', series(images));
-    watch(root + '/php/**/*.php', series(copyphp));
+    watch(`${root}/scss/**/*.scss`, series(styles, reload));
+    watch(`${root}/js/**/*.js`, series(scripts, reload));
+    watch(`${root}/images/**/*.{jpg,jpeg,png,svg,gif}`, series(images));
+    watch(`${root}/php/**/*.php`, series(copyphp, reload));
 };
 
 // Release to github
@@ -382,14 +395,57 @@ const addRelease = () => {
     return run(`git add CHANGELOG.md README.md package.json && git commit --amend --no-edit && git tag v${pkg.version} -m "Version ${pkg.version}" && git push && git push --tags`).exec();
 };
 
+// Build nucleus docs
 export const docs = () => {
-    return run(`nucleus --files ./${root}/scss/**/*.scss --target ./${dist}/styleguide --template=${root}/config/nucleus/`).exec();
+    return run(`nucleus --files ./${root}/scss/**/*.scss --target ./${wwwroot}/styleguide --template=${root}/config/nucleus/`).exec();
 };
 
-export const setup = series(setupEnvironment, setConfig);
-export const dev = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyplugins, docs, serve, watchForChanges);
-export const build = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyplugins, copyHtaccessProduction, docs);
-export const buildzip = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyHtaccessProduction, compress);
-export const bump = series(bumpPrompt);
-export const release = series(addRelease);
+// Import database dump
+export const dbimport = () => {
+    return run('npm run dbimport').exec();
+}
+
+// Compile po to mo
+export const translate = () => {
+    return run(`msgfmt -o wwwroot/wp-content/languages/themes/${pkg.name}-de_CH_informal.mo src/languages/${pkg.name}.po`).exec();
+}
+
+// Get images from live server
+const rsyncget = (done) => {
+    // rsync -avu --delete --progress ${pkg.url}@ssh.ENTER_SERVER_NAME_HERE.com:/wp-content/uploads ./wwwroot/wp-content/uploads
+    done();
+}
+
+export const rsyncpush = (done) => {
+    var rsync = new Rsync()
+        .shell('ssh')
+        .flags('azv')
+        .set('progress')
+        .source('./wwwroot/wp-content/themes/ENTER_THEME_NAME_HERE')
+        .destination('ENTER_USER_NAME_HERE@ssh.ENTER_SERVER_NAME_HERE.comserver:/public_htm');
+    
+    // Execute the command
+    rsync.execute(function(error, code, cmd) {
+        // we're done
+        done();
+    });
+    // return gulpSSH
+    // .exec(['uptime', 'ls -a', 'pwd'], {filePath: 'commands.log'})
+    // .pipe(dest('logs'))
+    // rsync [optionen] quelle ziel
+    // rsync -avu --delete --progress  ./wwwroot/wp-content/themes/${pkg.name} ${pkg.url}@ssh.ENTER_SERVER_NAME_HERE.com:/wp-content/themes/${pkg.name}
+    // rsync -avn quelle ziel (simulation)
+    // https://www.shellbefehle.de/befehle/rsync/
+    // https://www.npmjs.com/package/remote-sync
+    // https://stackoverflow.com/questions/49708424/nodejs-gulp-download-files-from-sftp
+}
+
+export const setup = series(setupEnvironment, setConfig, setComposerfile);
+export const dev = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyplugins, docs, renameTextdomain, makepot, serve, watchForChanges);
+export const build = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyplugins, copyHtaccessProduction, docs, renameTextdomain, makepot);
+export const buildzip = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyHtaccessProduction, renameTextdomain, makepot, compress);
+export const bump = bumpPrompt;
+export const release = addRelease;
+export const getimages = rsyncget;
+export const pushfiles = rsyncpush;
 export default dev;
