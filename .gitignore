@@ -112,3 +112,6 @@ wwwroot/*
 keys.php
 vendor/*
 config.nucleus.json
+composer.json
+composer.lock
+sql/*
