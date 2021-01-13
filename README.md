@@ -58,6 +58,7 @@ fi
 - enter your new WordPress theme project name
 - cd into your new WordPress theme project directory
 - run `npm install`
+- run `npm run installer`
 - run `vagrant up`
     - This installs an ubuntu on a VirtualBox and all needed packages for an apache and a SQL webserver
 - run `gulp setup`
@@ -65,16 +66,30 @@ fi
 - run `gulp`
 - happy coding
 
-## Commands
+## NPM Commands
+| command | description |
+|---------|-------------|
+| run installer | Runs `vagrant up`, `npm install`, `gulp setup` and `composer install` |
+| run updater | Runs `npm update` and `composer update` |
+| run dbimport | Runs dbimport.sh file |
+
+## Gulp Commands
 | command | description |
 |---------|-------------|
 | gulp    | Default gulp command |
-| gulp dev | Default gulp command |
+| gulp dev | Default gulp command, runs cleaner, docs, makepot, serve and watchers |
 | gulp build | Clens direcory, run styles, images, copy, scripts, addBanner copyplugins, copyHtaccessProduction, generates nucleus styleguide docs |
 | gulp buildZip | Cleans directory, run styles, images, copy, scripts, addBanner, and zipt the project for ulpoad |
 | gulp bump | Gives a bump version prompt to choose between patch, minor and major |
 | gulp release | Adds the bumped files, commit them with a release message and push them to github |
+| gulp dbimport | Runs the db import script. ().sql.gz file from wordpress plugin db migrations has to be in the sql directory |
+| gulp docs | Runs the nucleus styleguide building script |
+| gulp translate | Compiles .po to .mo file |
+| gulp getimages | *This function is not yet defined* |
+| gulp pushfiles | *This function is not yet defined* |
 
 ## TODOs
 * Remove the Vagrant stuff and add docker stuff
+
+### Done
 * DB migrating script
