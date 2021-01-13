@@ -1,0 +1,51 @@
+{
+  "repositories": [
+    {
+    "type": "composer",
+    "url": "https://wpackagist.org"
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "advanced-custom-fields/advanced-custom-fields-pro",
+        "version": "@@acf_version",
+        "type": "wordpress-plugin",
+        "dist": {
+          "type": "zip",
+          "url": "https://connect.advancedcustomfields.com/index.php?p=pro&a=download&t=@@acf_version&k=@@acf_pro_key"
+        }
+      }
+    }
+  ],
+  "require": {
+    "advanced-custom-fields/advanced-custom-fields-pro": "*",
+    "wpackagist-plugin/backupwordpress": "*",
+    "wpackagist-plugin/developer": "*",
+    "wpackagist-plugin/google-analytics-dashboard-for-wp": "*",
+    "wpackagist-plugin/log-deprecated-notices": "*",
+    "wpackagist-plugin/log-viewer": "*",
+    "wpackagist-plugin/ninja-forms": "*",
+    "wpackagist-plugin/post-type-archive-links": "*",
+    "wpackagist-plugin/redirection": "*",
+    "wpackagist-plugin/regenerate-thumbnails": "*",
+    "wpackagist-plugin/rewrite-rules-inspector": "*",
+    "wpackagist-plugin/safe-svg": "*",
+    "wpackagist-plugin/simply-show-ids": "*",
+    "wpackagist-plugin/theme-check": "*",
+    "wpackagist-plugin/woocommerce": "*",
+    "wpackagist-plugin/wordpress-seo": "*",
+    "wpackagist-plugin/wp-example-content": "*",
+    "wpackagist-plugin/wp-migrate-db": "*",
+    "wpackagist-plugin/wp-nested-pages": "*",
+    "wpackagist-plugin/wp-smushit": "*",
+    "wpackagist-plugin/wp-super-cache": "*",
+    "wpackagist-plugin/wp-user-avatar": "*",
+    "wp-sync-db/wp-sync-db": "dev-master"
+
+  },
+  "extra": {
+    "installer-paths": {
+      "wwwroot/wp-content/plugins/{$name}/": ["type:wordpress-plugin"]
+    }
+  }
+}
