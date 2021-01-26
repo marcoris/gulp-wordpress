@@ -90,6 +90,7 @@ fi
 
 ## TODOs
 * Remove the Vagrant stuff and add docker stuff
+* Add rsync functionality for pushing and pulling data
 
 ### Done
 * DB migrating script
