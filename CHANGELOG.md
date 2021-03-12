@@ -1,3 +1,13 @@
+<a name="0.0.6"></a>
+## [0.1.1](https://github.com/marcoris/gulp-wordpress/compare/v0.0.5...v0.1.1) (2021-03-12)
+
+
+### Bug Fixes
+
+* Update version ([ac4d6e8](https://github.com/marcoris/gulp-wordpress/commit/ac4d6e8))
+
+
+
 <a name="0.0.5"></a>
 ## [0.0.5](https://github.com/marcoris/gulp-wordpress/compare/v0.0.4...v0.0.5) (2020-03-19)
 
