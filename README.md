@@ -57,21 +57,23 @@ fi
 - run `sh createproject.sh`
 - enter your new WordPress theme project name
 - cd into your new WordPress theme project directory
-- run `npm install`
-- run `npm run installer`
-- run `vagrant up`
-    - This installs an ubuntu on a VirtualBox and all needed packages for an apache and a SQL webserver
-- run `gulp setup`
-- fill in all necessary data
-- run `gulp`
-- happy coding
+- install docker desktop
+  - Windows (https://desktop.docker.com/win/stable/Docker%20Desktop%20Installer.exe)
+  - Mac (https://desktop.docker.com/mac/stable/Docker.dmg)
+- run `sh installer.sh`
+
+
+## Daily developing commands
+- run `docker-compose up -d` to start the docker containers
+- run `gulp` to start de watchers and browser
+- run `docker-compose stop` to stop the docker containers
 
 ## NPM Commands
 | command | description |
 |---------|-------------|
-| run installer | Runs `vagrant up`, `npm install`, `gulp setup` and `composer install` |
-| run updater | Runs `npm update` and `composer update` |
-| run dbimport | Runs dbimport.sh file |
+| `npm run installer` | Runs `docker-compose up -d`, `npm install`, `gulp setup`, `composer self-update`, `composer install` and `gulp` |
+| `npm run updater` | Runs `npm update` and `composer update` |
+| `npm run dbimport` | Runs `dbimport.sh` file for importing database dump |
 
 ## Gulp Commands
 | command | description |
@@ -88,9 +90,12 @@ fi
 | gulp getimages | *This function is not yet defined* |
 | gulp pushfiles | *This function is not yet defined* |
 
+## DB migration
+On the wordpress site go to Tools > Migrate DB. Fill in the required fields like: `https://hostname.ch -> http://localhost:8080` and export it. Copy the exported database dump file (*.gz) into the `sql` folder and run `npm run dbimport`.
+
 ## TODOs
-* Remove the Vagrant stuff and add docker stuff
-* Add rsync functionality for pushing and pulling data
+* Add rsync functionality for pushing and pulling files
 
 ### Done
 * DB migrating script
+* Remove the Vagrant stuff and add docker stuff
