@@ -9,7 +9,6 @@ import conventionalChangelog from 'gulp-conventional-changelog';
 import eslint from 'gulp-eslint';
 import gulpif from 'gulp-if';
 import imagemin from 'gulp-imagemin';
-import notify from 'gulp-notify';
 import postcss from 'gulp-postcss';
 import prompt from 'gulp-prompt';
 import rename from 'gulp-rename';
@@ -320,21 +319,11 @@ export const changelog = () => {
         .pipe(dest('.'));
 };
 
-// Show hint
-export const showHint = () => {
-    return src('./package.json')
-        .pipe(notify({
-            'title': 'Push release!',
-            'message': 'npm run addRelease',
-            'wait': true
-        }));
-};
-
 // Bump up project version
 export const bumpPrompt = () => {
-    const runPatch = series(bumpPatch, changelog, showHint);
-    const runMinor = series(bumpMinor, changelog, showHint);
-    const runMajor = series(bumpMajor, changelog, showHint);
+    const runPatch = series(bumpPatch, changelog);
+    const runMinor = series(bumpMinor, changelog);
+    const runMajor = series(bumpMajor, changelog);
 
     return src('./gulpfile.babel.js')
         .pipe(prompt.prompt({
@@ -392,7 +381,7 @@ export const watchForChanges = () => {
 
 // Release to github
 const addRelease = () => {
-    return run(`git add CHANGELOG.md README.md package.json && git commit --amend --no-edit && git tag v${pkg.version} -m "Version ${pkg.version}" && git push && git push --tags`).exec();
+    return run(`git add CHANGELOG.md README.md package.json && git commit --amend --no-edit && git tag v${pkg.version} -m "Version ${pkg.version}" && git push -f && git push --tags`).exec();
 };
 
 // Build nucleus docs
@@ -403,18 +392,18 @@ export const docs = () => {
 // Import database dump
 export const dbimport = () => {
     return run('npm run dbimport').exec();
-}
+};
 
 // Compile po to mo
 export const translate = () => {
     return run(`msgfmt -o wwwroot/wp-content/languages/themes/${pkg.name}-de_CH_informal.mo src/languages/${pkg.name}.po`).exec();
-}
+};
 
 // Get images from live server
 const rsyncget = (done) => {
     // rsync -avu --delete --progress ${pkg.url}@ssh.ENTER_SERVER_NAME_HERE.com:/wp-content/uploads ./wwwroot/wp-content/uploads
     done();
-}
+};
 
 export const rsyncpush = (done) => {
     var rsync = new Rsync()
@@ -423,12 +412,13 @@ export const rsyncpush = (done) => {
         .set('progress')
         .source('./wwwroot/wp-content/themes/ENTER_THEME_NAME_HERE')
         .destination('ENTER_USER_NAME_HERE@ssh.ENTER_SERVER_NAME_HERE.comserver:/public_htm');
-    
+
     // Execute the command
     rsync.execute(function(error, code, cmd) {
         // we're done
         done();
     });
+
     // return gulpSSH
     // .exec(['uptime', 'ls -a', 'pwd'], {filePath: 'commands.log'})
     // .pipe(dest('logs'))
@@ -438,13 +428,13 @@ export const rsyncpush = (done) => {
     // https://www.shellbefehle.de/befehle/rsync/
     // https://www.npmjs.com/package/remote-sync
     // https://stackoverflow.com/questions/49708424/nodejs-gulp-download-files-from-sftp
-}
+};
 
 export const setup = series(setupEnvironment, setConfig, setComposerfile);
 export const dev = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyplugins, docs, renameTextdomain, makepot, serve, watchForChanges);
 export const build = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyplugins, copyHtaccessProduction, docs, renameTextdomain, makepot);
 export const buildzip = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyHtaccessProduction, renameTextdomain, makepot, compress);
-export const bump = bumpPrompt;
+export const bump = series(bumpPrompt, addRelease);
 export const release = addRelease;
 export const getimages = rsyncget;
 export const pushfiles = rsyncpush;
