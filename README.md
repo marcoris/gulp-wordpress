@@ -4,7 +4,7 @@
     <img height="150" src="wordpress.png">
 </p>
 
-Development environment with gulp, vagrant and virtualbox for developing WordPress themes.
+Development environment with gulp and docker for developing WordPress themes.
 
 ## Prerequirements
 >Create a new repository on github.
