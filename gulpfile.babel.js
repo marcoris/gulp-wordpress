@@ -102,6 +102,18 @@ const setupEnvironment = () => {
                 },
                 {
                     type: 'input',
+                    name: 'locale',
+                    message: 'WordPress locale?',
+                    default: 'de_CH'
+                },
+                {
+                    type: 'input',
+                    name: 'dockername',
+                    message: 'Dockername?',
+                    default: 'gulp-wordpress'
+                },
+                {
+                    type: 'input',
                     name: 'acfversion',
                     message: 'ACF Pro version?',
                     default: '5.6.7'
@@ -112,13 +124,15 @@ const setupEnvironment = () => {
                     message: 'ACF Pro key?',
                     default: ''
                 }], function(res) {
-                    //value is in res.first and res.second
+                    //value is in res.name
                     return src('.env')
                         .pipe(replace('hostinguser', res.hostinguser))
                         .pipe(replace('hosting', res.hosting))
                         .pipe(replace('acfpro', res.acfpro))
                         .pipe(replace('acfversion', res.acfversion))
                         .pipe(replace('wpversion', res.wpversion))
+                        .pipe(replace('locale', res.locale))
+                        .pipe(replace('dockername', res.dockername))
                         .pipe(dest('.'));
                 }));
         }
@@ -428,6 +442,11 @@ export const rsyncpush = (done) => {
     // https://www.shellbefehle.de/befehle/rsync/
     // https://www.npmjs.com/package/remote-sync
     // https://stackoverflow.com/questions/49708424/nodejs-gulp-download-files-from-sftp
+};
+
+// Checks WP version
+export const WPUpdate = () => {
+    return run(`sh wp-version-check.sh ${process.env.NEW_WP_VERSION} ${wwwroot}/wp-includes/version.php ${process.env.WP_LOCALE} ${process.env.DOCKER_NAME}`).exec();
 };
 
 export const setup = series(setupEnvironment, setConfig, setComposerfile);

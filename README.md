@@ -87,15 +87,19 @@ fi
 | gulp dbimport | Runs the db import script. ().sql.gz file from wordpress plugin db migrations has to be in the sql directory |
 | gulp docs | Runs the nucleus styleguide building script |
 | gulp translate | Compiles .po to .mo file |
-| gulp getimages | *This function is not yet defined* |
+| gulp WPUpdate | Checks the installed WordPress version and if it is not up to date install automatically the newest version. This can take several minutes! |
+| gulp pushfiles | *This function is not yet defined* |
 | gulp pushfiles | *This function is not yet defined* |
 
 ## DB migration
 On the wordpress site go to Tools > Migrate DB. Fill in the required fields like: `https://hostname.ch -> http://localhost:8080` and export it. Copy the exported database dump file (*.gz) into the `sql` folder and run `npm run dbimport`.
 
+## Updating WordPress
+Set the new Versionnumber in the `.env` file under `NEW_WP_VERSION`. Then run `gulp WPUpdate`. This can take several minutes!
 ## TODOs
 * Add rsync functionality for pushing and pulling files
 
 ### Done
+* Gulp task to update WordPress
 * DB migrating script
 * Remove the Vagrant stuff and add docker stuff
