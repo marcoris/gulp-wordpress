@@ -75,7 +75,7 @@ export const cleanall = () => del([dist, buildDir, wwwroot]);
 
 // Run vagrant up and install its dependencies to work with WordPress
 const setupEnvironment = () => {
-    src(`${root}/config/config.nucleus.json`)
+    src('./config/config.nucleus.json')
         .pipe(replace('@@themename', pkg.name))
         .pipe(dest('.'));
     if (fs.existsSync('.env_template')) {
@@ -137,7 +137,7 @@ const setConfig = () => {
     cmd.exec();
     var keys = fs.readFileSync('keys.php', 'utf-8');
 
-    return src(`${root}/config/wp-config.php`)
+    return src('./config/wp-config.php')
         .pipe(prompt.prompt({
             type: 'checkbox',
             name: 'config',
@@ -145,7 +145,7 @@ const setConfig = () => {
             choices: ['local', 'staging', 'production']
         }, function(res) {
             if (res.config[0] == 'staging') {
-                src(`${root}/config/wp-config.php`)
+                src('./config/wp-config.php')
                     .pipe(replace('@@db_name', process.env.STAGE_DB_NAME))
                     .pipe(replace('@@db_user', process.env.STAGE_DB_USER))
                     .pipe(replace('@@db_pass', process.env.STAGE_DB_PASS))
@@ -158,7 +158,7 @@ const setConfig = () => {
                     .pipe(replace('@@include', keys))
                     .pipe(dest(wwwroot));
             } else if (res.config[0] == 'production') {
-                src(`${root}/config/wp-config.php`)
+                src('./config/wp-config.php')
                     .pipe(replace('@@db_name', process.env.PRODUCTION_DB_NAME))
                     .pipe(replace('@@db_user', process.env.PRODUCTION_DB_USER))
                     .pipe(replace('@@db_pass', process.env.PRODUCTION_DB_PASS))
@@ -171,7 +171,7 @@ const setConfig = () => {
                     .pipe(replace('@@include', keys))
                     .pipe(dest(wwwroot));
             } else {
-                src(`${root}/config/wp-config.php`)
+                src('./config/wp-config.php')
                     .pipe(replace('@@db_name', process.env.LOCAL_DB_NAME))
                     .pipe(replace('@@db_user', process.env.LOCAL_DB_USER))
                     .pipe(replace('@@db_pass', process.env.LOCAL_DB_PASS))
@@ -224,7 +224,7 @@ export const styles = () => {
 
 // Add banner
 const addBanner = () => {
-    return src(`${root}/config/style.css`)
+    return src('./config/style.css')
         .pipe(banner(comment, {
             pkg
         }))
@@ -386,7 +386,7 @@ const addRelease = () => {
 
 // Build nucleus docs
 export const docs = () => {
-    return run(`nucleus --files ./${root}/scss/**/*.scss --target ./${wwwroot}/styleguide --template=${root}/config/nucleus/`).exec();
+    return run(`nucleus --files ./${root}/scss/**/*.scss --target ./${wwwroot}/styleguide --template=/config/nucleus/`).exec();
 };
 
 // Import database dump
