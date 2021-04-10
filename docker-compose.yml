@@ -25,5 +25,18 @@ services:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: wordpress
+
+  wpcli:
+    image: tatemz/wp-cli
+    volumes:
+      - ./wwwroot:/var/www/html
+    ports:
+      - "8080:80"
+    links:
+      - db:mysql
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
 volumes:
   db_data:
