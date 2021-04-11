@@ -96,8 +96,13 @@ On the wordpress site go to Tools > Migrate DB. Fill in the required fields like
 
 ## Updating WordPress
 Set the new Versionnumber in the `.env` file under `NEW_WP_VERSION`. Then run `gulp WPUpdate`. This can take several minutes!
+
+## Translation
+First run the following command to make the *.pot file: `gulp makepot`. Then translate it with poedit and save the *.po file. After saving run `gulp potomo` to generate the binary file in the wwwroot directory.
+
 ## TODOs
 * Add rsync functionality for pushing and pulling files
+* Put gulp tasks in separate files to keep it clean
 
 ### Done
 * Gulp task to update WordPress

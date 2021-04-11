@@ -1,77 +1,25 @@
 // Gulp plugins
-import {src, dest, watch, series, parallel} from 'gulp';
-import babel from 'gulp-babel';
-import banner from 'gulp-banner';
+import {src, dest, series, parallel} from 'gulp';
 import bumpVersion from 'gulp-bump';
-import concat from 'gulp-concat';
-import cleanCss from 'gulp-clean-css';
 import conventionalChangelog from 'gulp-conventional-changelog';
-import eslint from 'gulp-eslint';
 import gulpif from 'gulp-if';
-import imagemin from 'gulp-imagemin';
-import postcss from 'gulp-postcss';
 import prompt from 'gulp-prompt';
 import rename from 'gulp-rename';
 import replace from 'gulp-replace';
 import run from 'gulp-run';
-import sass from 'gulp-sass';
-import sassLint from 'gulp-sass-lint';
-import sourcemaps from 'gulp-sourcemaps';
-import uglify from 'gulp-uglify';
-import wpPot from 'gulp-wp-pot';
 import zip from 'gulp-zip';
 
 // Other plugins
 import Rsync from 'rsync';
 import pkg from './package.json';
-import autoprefixer from 'autoprefixer';
-import del from 'del';
-import browserSync from 'browser-sync';
-import yargs from 'yargs';
 import fs from 'fs';
 
-// Configs
-const PRODUCTION = yargs.argv.prod;
-const server = browserSync.create();
 require('dotenv').config();
+
 const dist = `wwwroot/wp-content/themes/${pkg.name}`,
     root = 'src',
     wwwroot = 'wwwroot',
     buildDir = 'build';
-
-// Browsersync
-const serve = done => {
-    server.init({
-        proxy: 'http://localhost:8080',
-        files: [`${root}/scss/**/*.scss`, `${root}/js/**/*.js`]
-    });
-    done();
-};
-const reload = done => {
-    server.reload();
-    done();
-};
-
-// WordPress banner
-const comment = '/*\n' +
-` * Theme Name: ${pkg.name}\n` +
-` * Author: ${pkg.author}\n` +
-` * Author URI: ${pkg.website}\n` +
-` * Description: ${pkg.description}\n` +
-` * Version: ${pkg.version}\n` +
-` * License: ${pkg.license}\n` +
-` * License URI: ${pkg.license_uri}\n` +
-` * Text Domain: ${pkg.name}\n` +
-` * Tags: ${pkg.keywords}\n` +
-` * Copyright: ${pkg.year} ${pkg.author}\n` +
-' * This stylesheet is not used by this WordPress site it only exists as reference for WordPress. The stylesheet in use can be found in this folder as style.min.{hash}.css\n' +
-'*/\n';
-
-// Clean
-export const clean = () => del([dist, buildDir]);
-
-// Clean all
-export const cleanall = () => del([dist, buildDir, wwwroot]);
 
 // Run vagrant up and install its dependencies to work with WordPress
 const setupEnvironment = () => {
@@ -210,88 +158,10 @@ const setComposerfile = () => {
         .pipe(dest('.'));
 };
 
-// Styles
-export const styles = () => {
-    return src(`${root}/scss/style.scss`)
-        .pipe(sassLint())
-        .pipe(sassLint.format())
-        .pipe(sassLint.failOnError())
-        .pipe(gulpif(!PRODUCTION, sourcemaps.init()))
-        .pipe(sass().on('error', sass.logError))
-        .pipe(gulpif(PRODUCTION, postcss([autoprefixer(
-            'last 2 versions',
-            '> 1%',
-            'safari 5',
-            'ie 8',
-            'ie 9',
-            'opera 12.1',
-            'ios 6',
-            'android 4' )])))
-        .pipe(gulpif(PRODUCTION, cleanCss({
-            compatibility: 'ie8'
-        })))
-        .pipe(gulpif(!PRODUCTION, sourcemaps.write()))
-        .pipe(rename('style.min.css'))
-        .pipe(dest(`${dist}/assets/css`))
-        .pipe(server.stream());
-};
-
-// Add banner
-const addBanner = () => {
-    return src('./config/style.css')
-        .pipe(banner(comment, {
-            pkg
-        }))
-        .pipe(dest(dist));
-};
-
-// Images
-export const images = () => {
-    return src(`${root}/images/**/*.{jpg,jpeg,png,svg,gif}`)
-        .pipe(gulpif(PRODUCTION, imagemin()))
-        .pipe(dest(`${dist}/assets/images`));
-};
-
-// Copy
-export const copy = () => {
-    return src(`${root}/**/*.{mo,po,htaccess}`)
-        .pipe(dest(dist));
-};
-
-const copyphp = () => {
-    return src(`${root}/php/**/*.php`)
-        .pipe(dest(dist));
-};
-
-const copyLanguage = () => {
-    return src(`${root}/languages/*.{mo,po}`)
-        .pipe(dest(dist));
-};
-
 // Copy production htaccess
 const copyHtaccessProduction = () => {
     return src('node_modules/apache-server-configs/dist/.htaccess')
         .pipe(dest(wwwroot));
-};
-
-// Copy glugins
-export const copyplugins = () => {
-    return src(`${root}/plugins/**/*`)
-        .pipe(dest(`${wwwroot}/wp-content/plugins`));
-};
-
-// Scripts
-export const scripts = () => {
-    return src(`${root}/js/**/*.js`)
-        .pipe(eslint())
-        .pipe(eslint.format())
-        .pipe(eslint.failAfterError())
-        .pipe(concat('main.min.js'))
-        .pipe(babel({
-            presets: ['@babel/env']
-        }))
-        .pipe(gulpif(PRODUCTION, uglify()))
-        .pipe(dest(`${dist}/assets/js`));
 };
 
 // Bump version x.x.1
@@ -366,51 +236,9 @@ export const compress = () => {
         .pipe(dest(buildDir));
 };
 
-// Generate POT
-export const makepot = () => {
-    return src(`${root}/php/**/*.php`)
-        .pipe(
-            wpPot({
-                domain: 'gulpwordpress',
-                package: pkg.name
-            })
-        )
-        .pipe(dest(`${root}/languages/${pkg.name}.pot`));
-};
-
-// Rename textdomain in all php files
-export const renameTextdomain = () => {
-    return src(`${root}/php/**/*.php`)
-        .pipe(replace('gulpwordpress', pkg.name))
-        .pipe(dest(dist));
-};
-
-// Watch
-export const watchForChanges = () => {
-    watch(`${root}/scss/**/*.scss`, series(styles, reload));
-    watch(`${root}/js/**/*.js`, series(scripts, reload));
-    watch(`${root}/images/**/*.{jpg,jpeg,png,svg,gif}`, series(images));
-    watch(`${root}/php/**/*.php`, series(copyphp, reload));
-};
-
 // Release to github
 const addRelease = () => {
     return run(`git add CHANGELOG.md README.md package.json && git commit --amend --no-edit && git tag v${pkg.version} -m "Version ${pkg.version}" && git push -f && git push --tags`).exec();
-};
-
-// Build nucleus docs
-export const docs = () => {
-    return run(`nucleus --files ./${root}/scss/**/*.scss --target ./${wwwroot}/styleguide --template=/config/nucleus/`).exec();
-};
-
-// Import database dump
-export const dbimport = () => {
-    return run('npm run dbimport').exec();
-};
-
-// Compile po to mo
-export const translate = () => {
-    return run(`msgfmt -o wwwroot/wp-content/languages/themes/${pkg.name}-de_CH_informal.mo src/languages/${pkg.name}.po`).exec();
 };
 
 // Get images from live server
@@ -444,15 +272,65 @@ export const rsyncpush = (done) => {
     // https://stackoverflow.com/questions/49708424/nodejs-gulp-download-files-from-sftp
 };
 
-// Checks WP version
-export const WPUpdate = () => {
-    return run(`sh wp-version-check.sh ${process.env.NEW_WP_VERSION} ${wwwroot}/wp-includes/version.php ${process.env.WP_LOCALE} ${process.env.DOCKER_NAME}`).exec();
-};
+// Checks and updates WP version
+import WPUpdate from './gulp/wpupdate';
+exports.WPUpdate = WPUpdate;
+
+// DB import
+import dbimport from './gulp/dbimport';
+exports.dbimport = dbimport;
+
+// Makes *.pot file
+import makepot from './gulp/makepot';
+exports.makepot = makepot;
+
+// PO to MO
+import potomo from './gulp/potomo';
+exports.potomo = potomo;
+
+// Compile the styleguide
+import docs from './gulp/docs';
+
+// Adds the necessary template style.css with the information
+import addbanner from './gulp/addbanner';
+
+// Adds the necessary template style.css with the information
+import watchForChanges from './gulp/watch';
+
+// serve
+import serve from './gulp/serve';
+
+// Styles
+import styles from './gulp/styles';
+
+// Scripts
+import scripts from './gulp/scripts';
+
+// Clean
+import clean from './gulp/clean';
+
+// Clean all
+import cleanall from './gulp/cleanall';
+
+// Images
+import images from './gulp/images';
+
+// Plugins
+import plugins from './gulp/plugins';
+
+// Rename textdomain
+import renametextdomain from './gulp/renametextdomain';
+
+// Copy php
+import copyphp from './gulp/copyphp';
+
+// Copy files
+import copyfiles from './gulp/copyfiles';
 
 export const setup = series(setupEnvironment, setConfig, setComposerfile);
-export const dev = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyplugins, docs, renameTextdomain, makepot, serve, watchForChanges);
-export const build = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyplugins, copyHtaccessProduction, docs, renameTextdomain, makepot);
-export const buildzip = series(clean, parallel(styles, images, copy, copyphp, scripts), addBanner, copyHtaccessProduction, renameTextdomain, makepot, compress);
+export const dev = series(clean, parallel(styles, images, copyfiles, copyphp, scripts), addbanner, plugins, docs, renametextdomain, makepot, serve, watchForChanges);
+export const build = series(cleanall, parallel(styles, images, copyfiles, copyphp, scripts), addbanner, plugins, copyHtaccessProduction, docs, renametextdomain, makepot);
+export const buildzip = series(cleanall, parallel(styles, images, copyfiles, copyphp, scripts), addbanner, copyHtaccessProduction, renametextdomain, makepot, compress);
 export const bump = series(bumpPrompt, addRelease);
 export const release = addRelease;
 export const getimages = rsyncget;
