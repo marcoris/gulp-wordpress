@@ -7,7 +7,7 @@ const makepot = () => {
     return src('src/php/**/*.php')
         .pipe(
             wpPot({
-                domain: pkg.name,
+                domain: 'gulpwordpress',
                 package: pkg.name
             })
         )

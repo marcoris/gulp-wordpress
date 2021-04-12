@@ -1,13 +1,11 @@
 // Gulp plugins
-import {src, dest, series, parallel} from 'gulp';
+import {src, dest, series} from 'gulp';
 import bumpVersion from 'gulp-bump';
 import conventionalChangelog from 'gulp-conventional-changelog';
-import gulpif from 'gulp-if';
 import prompt from 'gulp-prompt';
 import rename from 'gulp-rename';
 import replace from 'gulp-replace';
 import run from 'gulp-run';
-import zip from 'gulp-zip';
 
 // Other plugins
 import Rsync from 'rsync';
@@ -15,11 +13,6 @@ import pkg from './package.json';
 import fs from 'fs';
 
 require('dotenv').config();
-
-const dist = `wwwroot/wp-content/themes/${pkg.name}`,
-    root = 'src',
-    wwwroot = 'wwwroot',
-    buildDir = 'build';
 
 // Run vagrant up and install its dependencies to work with WordPress
 const setupEnvironment = () => {
@@ -118,7 +111,7 @@ const setConfig = () => {
                     .pipe(replace('@@disallow_file_mods', process.env.STAGE_DISALLOW_FILE_MODS))
                     .pipe(replace('@@wp_allow_multisite', process.env.STAGE_WP_ALLOW_MULTISITE))
                     .pipe(replace('@@include', keys))
-                    .pipe(dest(wwwroot));
+                    .pipe(dest('wwwroot'));
             } else if (res.config[0] == 'production') {
                 src('./config/wp-config.php')
                     .pipe(replace('@@db_name', process.env.PRODUCTION_DB_NAME))
@@ -131,7 +124,7 @@ const setConfig = () => {
                     .pipe(replace('@@disallow_file_mods', process.env.PRODUCTION_DISALLOW_FILE_MODS))
                     .pipe(replace('@@wp_allow_multisite', process.env.PRODUCTION_WP_ALLOW_MULTISITE))
                     .pipe(replace('@@include', keys))
-                    .pipe(dest(wwwroot));
+                    .pipe(dest('wwwroot'));
             } else {
                 src('./config/wp-config.php')
                     .pipe(replace('@@db_name', process.env.LOCAL_DB_NAME))
@@ -144,7 +137,7 @@ const setConfig = () => {
                     .pipe(replace('@@disallow_file_mods', process.env.LOCAL_DISALLOW_FILE_MODS))
                     .pipe(replace('@@wp_allow_multisite', process.env.LOCAL_WP_ALLOW_MULTISITE))
                     .pipe(replace('@@include', keys))
-                    .pipe(dest(wwwroot));
+                    .pipe(dest('wwwroot'));
             }
         }));
 };
@@ -161,7 +154,7 @@ const setComposerfile = () => {
 // Copy production htaccess
 const copyHtaccessProduction = () => {
     return src('node_modules/apache-server-configs/dist/.htaccess')
-        .pipe(dest(wwwroot));
+        .pipe(dest('wwwroot'));
 };
 
 // Bump version x.x.1
@@ -226,16 +219,6 @@ export const bumpPrompt = () => {
         }));
 };
 
-// Generate ZIP
-export const compress = () => {
-    return src(dist)
-        .pipe(gulpif(
-            file => file.relative.split('.').pop() !== 'zip', replace('_themename', pkg.name)
-        ))
-        .pipe(zip(`${pkg.name}.zip`))
-        .pipe(dest(buildDir));
-};
-
 // Release to github
 const addRelease = () => {
     return run(`git add CHANGELOG.md README.md package.json && git commit --amend --no-edit && git tag v${pkg.version} -m "Version ${pkg.version}" && git push -f && git push --tags`).exec();
@@ -243,7 +226,7 @@ const addRelease = () => {
 
 // Get images from live server
 const rsyncget = (done) => {
-    // rsync -avu --delete --progress ${pkg.url}@ssh.ENTER_SERVER_NAME_HERE.com:/wp-content/uploads ./wwwroot/wp-content/uploads
+    // rsync -avu --delete --progress ${pkg.url}@ssh.ENTER_SERVER_NAME_HERE.com:/wp-content/uploads ./'wwwroot'/wp-content/uploads
     done();
 };
 
@@ -265,7 +248,7 @@ export const rsyncpush = (done) => {
     // .exec(['uptime', 'ls -a', 'pwd'], {filePath: 'commands.log'})
     // .pipe(dest('logs'))
     // rsync [optionen] quelle ziel
-    // rsync -avu --delete --progress  ./wwwroot/wp-content/themes/${pkg.name} ${pkg.url}@ssh.ENTER_SERVER_NAME_HERE.com:/wp-content/themes/${pkg.name}
+    // rsync -avu --delete --progress  ./'wwwroot'/wp-content/themes/${pkg.name} ${pkg.url}@ssh.ENTER_SERVER_NAME_HERE.com:/wp-content/themes/${pkg.name}
     // rsync -avn quelle ziel (simulation)
     // https://www.shellbefehle.de/befehle/rsync/
     // https://www.npmjs.com/package/remote-sync
@@ -280,9 +263,12 @@ exports.WPUpdate = WPUpdate;
 import dbimport from './gulp/dbimport';
 exports.dbimport = dbimport;
 
+// Rename textdomain
+import renametextdomain from './gulp/renametextdomain';
+
 // Makes *.pot file
 import makepot from './gulp/makepot';
-exports.makepot = makepot;
+exports.makepot = series(renametextdomain, makepot);
 
 // PO to MO
 import potomo from './gulp/potomo';
@@ -318,19 +304,19 @@ import images from './gulp/images';
 // Plugins
 import plugins from './gulp/plugins';
 
-// Rename textdomain
-import renametextdomain from './gulp/renametextdomain';
-
 // Copy php
 import copyphp from './gulp/copyphp';
 
 // Copy files
 import copyfiles from './gulp/copyfiles';
 
+// Copy files
+import generatezip from './gulp/generatezip';
+
 export const setup = series(setupEnvironment, setConfig, setComposerfile);
-export const dev = series(clean, parallel(styles, images, copyfiles, copyphp, scripts), addbanner, plugins, docs, renametextdomain, makepot, serve, watchForChanges);
-export const build = series(cleanall, parallel(styles, images, copyfiles, copyphp, scripts), addbanner, plugins, copyHtaccessProduction, docs, renametextdomain, makepot);
-export const buildzip = series(cleanall, parallel(styles, images, copyfiles, copyphp, scripts), addbanner, copyHtaccessProduction, renametextdomain, makepot, compress);
+export const dev = series(clean, styles, images, copyfiles, copyphp, scripts, addbanner, plugins, docs, makepot, serve, watchForChanges);
+export const build = series(cleanall, styles, images, copyfiles, copyphp, scripts, addbanner, plugins, copyHtaccessProduction, docs, makepot);
+export const buildzip = series(cleanall, styles, images, copyfiles, copyphp, scripts, addbanner, copyHtaccessProduction, makepot, generatezip);
 export const bump = series(bumpPrompt, addRelease);
 export const release = addRelease;
 export const getimages = rsyncget;
