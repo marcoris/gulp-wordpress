@@ -24,13 +24,7 @@
 
 $city = 'london';
 
-echo esc_html__( 'Your city is', 'gulpwordpress' ) . $city;
-
-printf(
-    /* tanslators: %s is the city name */
-    esc_html__( 'Your city is %s', 'gulpwordpress' ),
-    $city
-);
+echo esc_html__( 'Your city is ', 'gulpwordpress' ) . $city;
 
 ?>
 

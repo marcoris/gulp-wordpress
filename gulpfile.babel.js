@@ -14,7 +14,7 @@ import fs from 'fs';
 
 require('dotenv').config();
 
-// Run vagrant up and install its dependencies to work with WordPress
+// Set nucleus styleguide config and .env file
 const setupEnvironment = () => {
     src('./config/config.nucleus.json')
         .pipe(replace('@@themename', pkg.name))
@@ -274,49 +274,49 @@ exports.makepot = series(renametextdomain, makepot);
 import potomo from './gulp/potomo';
 exports.potomo = potomo;
 
-// Compile the styleguide
+// Compiles the styleguide
 import docs from './gulp/docs';
 
 // Adds the necessary template style.css with the information
 import addbanner from './gulp/addbanner';
 
-// Adds the necessary template style.css with the information
+// Watch task
 import watchForChanges from './gulp/watch';
 
-// serve
+// Serve task
 import serve from './gulp/serve';
 
-// Styles
+// Styles task
 import styles from './gulp/styles';
 
-// Scripts
+// Scripts task
 import scripts from './gulp/scripts';
 
-// Clean
+// Cleans the themes directory
 import clean from './gulp/clean';
 
-// Clean all
+// Cleans the themes and build directory
 import cleanall from './gulp/cleanall';
 
-// Images
+// Images task
 import images from './gulp/images';
 
-// Plugins
+// Plugins task
 import plugins from './gulp/plugins';
 
-// Copy php
+// PHP task
 import copyphp from './gulp/copyphp';
 
-// Copy files
+// Copy files (mo,po,htaccess)
 import copyfiles from './gulp/copyfiles';
 
 // Copy files
 import generatezip from './gulp/generatezip';
 
 export const setup = series(setupEnvironment, setConfig, setComposerfile);
-export const dev = series(clean, styles, images, copyfiles, copyphp, scripts, addbanner, plugins, docs, makepot, serve, watchForChanges);
-export const build = series(cleanall, styles, images, copyfiles, copyphp, scripts, addbanner, plugins, copyHtaccessProduction, docs, makepot);
-export const buildzip = series(cleanall, styles, images, copyfiles, copyphp, scripts, addbanner, copyHtaccessProduction, makepot, generatezip);
+export const dev = series(clean, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, plugins, docs, serve, watchForChanges);
+export const build = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, plugins, copyHtaccessProduction, docs);
+export const buildzip = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, copyHtaccessProduction, generatezip);
 export const bump = series(bumpPrompt, addRelease);
 export const release = addRelease;
 export const getimages = rsyncget;
