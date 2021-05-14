@@ -49,6 +49,7 @@ services:
     image: tatemz/wp-cli
     volumes:
       - ./wwwroot:/var/www/html
+    restart: always
     ports:
       - '8001:80'
     links:
