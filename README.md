@@ -7,65 +7,16 @@
 Development environment with gulp and docker for developing WordPress themes.
 
 ## Prerequirements
->Create a new repository on github.
-
-Make a file called `createproject.sh` with the content above:
-
-```
-#!/bin/bash
-echo -n "Enter new project name: "
-read -e projectname
-
-if [ -z "$projectname" ]
-then
-    echo "You must enter a project name..."
-    exit 1
-else
-    # Clone gulp wordpress repo
-    git clone https://github.com/marcoris/gulp-wordpress.git $projectname
-    cd $projectname
-    # Remove origin to make it independent
-    git remote rm origin
-    git remote add origin https://github.com/marcoris/$projectname.git
-    # Delete README.md and CHANGELOG.md
-    rm README.md
-    rm CHANGELOG.md
-    # Create new README.md and CHANGELOG.md
-    touch README.md
-    touch CHANGELOG.md
-    # Delete local tags.
-    git tag -d $(git tag -l)
-    # Fetch remote tags.
-    git fetch
-    # Delete remote tags.
-    git push origin --delete $(git tag -l)
-    # Delete local tags.
-    git tag -d $(git tag -l)
-    # Reset commits
-    git checkout --orphan temp_branch
-    git add -A
-    git commit -am "Initial commit"
-    git branch -D master
-    git branch -m master
-    git push -f -u origin master
-    code .
-fi
-```
+- Installation of Node.js: https://nodejs.org/en
+- Install docker desktop: https://desktop.docker.com
+- Install composer: https://getcomposer.org/download
 
 ## Getting started
-- cd into the directory of that file
-- run `sh createproject.sh`
-- enter your new WordPress theme project name
-- cd into your new WordPress theme project directory
-- install docker desktop
-  - Windows (https://desktop.docker.com/win/stable/Docker%20Desktop%20Installer.exe)
-  - Mac (https://desktop.docker.com/mac/stable/Docker.dmg)
-- run `sh installer.sh`
-
+- run `sh installer.sh` or `npm run installer`
 
 ## Daily developing commands
-- run `docker-compose up -d` to start the docker containers
-- run `gulp` to start de watchers and browser
+- run `docker-compose up -d` to start the docker containers (if not already started)
+- run `gulp` to start de watchers and browserSync
 - run `docker-compose stop` to stop the docker containers
 
 ## NPM Commands
@@ -92,7 +43,7 @@ fi
 | gulp pushfiles | *This function is not yet defined* |
 
 ## DB migration
-On the wordpress site go to Tools > Migrate DB. Fill in the required fields like: `https://hostname.ch -> http://localhost:8080` and export it. Copy the exported database dump file (*.gz) into the `sql` folder and run `npm run dbimport`.
+On the wordpress site go to Tools > Migrate DB. Fill in the required fields like: `https://hostname.ch -> http://localhost:8080` and export it (e.x. live2local). Just put the exported database dump file (*.gz) into the `sql` folder and run `npm run dbimport`.
 
 ## Updating WordPress
 Set the new Versionnumber in the `.env` file under `NEW_WP_VERSION`. Then run `gulp WPUpdate`. This can take several minutes!
@@ -102,7 +53,7 @@ First run the following command to make the *.pot file: `gulp makepot`. Then tra
 
 ## TODOs
 * Put gulp tasks (setup, version bump, release) in separate files to keep it clean
-* Gulp task to get data from stage or production (`uploads` dir and `sql dump`)
+* Gulp task to get data from stage or production (both `uploads` dir and `sql dump` at the same time)
 * WP-Translations
 
 ### Done
