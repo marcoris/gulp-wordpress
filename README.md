@@ -101,10 +101,14 @@ Set the new Versionnumber in the `.env` file under `NEW_WP_VERSION`. Then run `g
 First run the following command to make the *.pot file: `gulp makepot`. Then translate it with poedit and save the *.po file. After saving run `gulp potomo` to generate the binary file in the wwwroot directory.
 
 ## TODOs
-* Add rsync functionality for pushing and pulling files
-* Put gulp tasks in separate files to keep it clean
+* Put gulp tasks (setup, version bump, release) in separate files to keep it clean
+* Gulp task to get data from stage or production (`uploads` dir and `sql dump`)
+* WP-Translations
 
 ### Done
+* Gulp task to push `uploads` directory from local to remote (staging or production)
+* Gulp task to pull `uploads` directory from remote (staging or production) to local
+* Gulp task to deploying the theme on staging or production
 * Gulp task to update WordPress
 * DB migrating script
 * Remove the Vagrant stuff and add docker stuff
