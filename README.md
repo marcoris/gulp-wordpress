@@ -11,6 +11,14 @@ Development environment with gulp and docker for developing WordPress themes.
 - Install docker desktop: https://desktop.docker.com
 - Install composer: https://getcomposer.org/download
 
+### Hosting
+- Add stage.domain.com
+- Add live database
+- Add staging database
+- Add live@domain.com ftp account
+- Add stage@domain.com ftp account
+Make shure you have all accounts unlocked and remote mysql access activated
+
 ## Getting started
 - run `sh installer.sh` or `npm run installer`
 
