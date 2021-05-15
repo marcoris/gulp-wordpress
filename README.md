@@ -20,7 +20,7 @@ Development environment with gulp and docker for developing WordPress themes.
 Make shure you have all accounts unlocked and remote mysql access activated
 
 ## Getting started
-- run `sh installer.sh` or `npm run installer`
+- run `sh installer.sh` or `npm run installer`.
 
 ## Daily developing commands
 - run `docker-compose up -d` to start the docker containers (if not already started)
