@@ -13,143 +13,6 @@ import fs from 'fs';
 
 require('dotenv').config();
 
-// Set nucleus styleguide config and .env file
-const setupEnvironment = () => {
-    src('./config/config.nucleus.json')
-        .pipe(replace('@@themename', pkg.name))
-        .pipe(dest('.'));
-    if (fs.existsSync('.env_template')) {
-        if (!fs.existsSync('.env')) {
-            return src('.env_template')
-                .pipe(run('cp .env_template .env'))
-                .pipe(prompt.prompt([{
-                    type: 'input',
-                    name: 'hosting',
-                    message: 'Hostname: 1ahosting?',
-                    default: '1ahosting'
-                },
-                {
-                    type: 'input',
-                    name: 'hostinguser',
-                    message: 'Hostinguser?',
-                    default: pkg.name
-                },
-                {
-                    type: 'input',
-                    name: 'wpversion',
-                    message: 'WordPress version?',
-                    default: '5.3.2'
-                },
-                {
-                    type: 'input',
-                    name: 'locale',
-                    message: 'WordPress locale?',
-                    default: 'de_CH'
-                },
-                {
-                    type: 'input',
-                    name: 'dockername',
-                    message: 'Dockername?',
-                    default: 'gulpwordpress'
-                },
-                {
-                    type: 'input',
-                    name: 'acfversion',
-                    message: 'ACF Pro version?',
-                    default: '5.6.7'
-                },
-                {
-                    type: 'input',
-                    name: 'acfpro',
-                    message: 'ACF Pro key?',
-                    default: ''
-                }], function(res) {
-                    //value is in res.name
-                    return src('.env')
-                        .pipe(replace('hostinguser', res.hostinguser))
-                        .pipe(replace('hosting', res.hosting))
-                        .pipe(replace('acfpro', res.acfpro))
-                        .pipe(replace('acfversion', res.acfversion))
-                        .pipe(replace('wpversion', res.wpversion))
-                        .pipe(replace('locale', res.locale))
-                        .pipe(replace('dockername', res.dockername))
-                        .pipe(dest('.'));
-                }));
-        }
-
-        return src('.env')
-            .pipe(run('echo .env already exists'));
-    }
-
-    return src('.env')
-        .pipe(run('echo .env_template does not exist!'));
-};
-
-// Sets the configuration
-const setConfig = () => {
-    var cmd = new run.Command('sh getKeys.sh');
-    cmd.exec();
-    var keys = fs.readFileSync('keys.php', 'utf-8');
-
-    return src('./config/wp-config.php')
-        .pipe(prompt.prompt({
-            type: 'checkbox',
-            name: 'config',
-            message: 'Setup for?',
-            choices: ['local', 'staging', 'production']
-        }, function(res) {
-            if (res.config[0] == 'staging') {
-                src('./config/wp-config.php')
-                    .pipe(replace('@@db_name', process.env.STAGING_DB_NAME))
-                    .pipe(replace('@@db_user', process.env.STAGING_DB_USER))
-                    .pipe(replace('@@db_pass', process.env.STAGING_DB_PASS))
-                    .pipe(replace('@@db_host', process.env.STAGING_DB_HOST))
-                    .pipe(replace('@@db_prefix', process.env.DB_PREFIX))
-                    .pipe(replace('@@wp_debug', process.env.STAGING_WP_DEBUG))
-                    .pipe(replace('@@save_queries', process.env.STAGING_SAVEQUERIES))
-                    .pipe(replace('@@disallow_file_mods', process.env.STAGING_DISALLOW_FILE_MODS))
-                    .pipe(replace('@@wp_allow_multisite', process.env.STAGING_WP_ALLOW_MULTISITE))
-                    .pipe(replace('@@include', keys))
-                    .pipe(dest('wwwroot'));
-            } else if (res.config[0] == 'production') {
-                src('./config/wp-config.php')
-                    .pipe(replace('@@db_name', process.env.PRODUCTION_DB_NAME))
-                    .pipe(replace('@@db_user', process.env.PRODUCTION_DB_USER))
-                    .pipe(replace('@@db_pass', process.env.PRODUCTION_DB_PASS))
-                    .pipe(replace('@@db_host', process.env.PRODUCTION_DB_HOST))
-                    .pipe(replace('@@db_prefix', process.env.DB_PREFIX))
-                    .pipe(replace('@@wp_debug', process.env.PRODUCTION_WP_DEBUG))
-                    .pipe(replace('@@save_queries', process.env.PRODUCTION_SAVEQUERIES))
-                    .pipe(replace('@@disallow_file_mods', process.env.PRODUCTION_DISALLOW_FILE_MODS))
-                    .pipe(replace('@@wp_allow_multisite', process.env.PRODUCTION_WP_ALLOW_MULTISITE))
-                    .pipe(replace('@@include', keys))
-                    .pipe(dest('wwwroot'));
-            } else {
-                src('./config/wp-config.php')
-                    .pipe(replace('@@db_name', process.env.LOCAL_DB_NAME))
-                    .pipe(replace('@@db_user', process.env.LOCAL_DB_USER))
-                    .pipe(replace('@@db_pass', process.env.LOCAL_DB_PASS))
-                    .pipe(replace('@@db_host', process.env.LOCAL_DB_HOST))
-                    .pipe(replace('@@db_prefix', process.env.DB_PREFIX))
-                    .pipe(replace('@@wp_debug', process.env.LOCAL_WP_DEBUG))
-                    .pipe(replace('@@save_queries', process.env.LOCAL_SAVEQUERIES))
-                    .pipe(replace('@@disallow_file_mods', process.env.LOCAL_DISALLOW_FILE_MODS))
-                    .pipe(replace('@@wp_allow_multisite', process.env.LOCAL_WP_ALLOW_MULTISITE))
-                    .pipe(replace('@@include', keys))
-                    .pipe(dest('wwwroot'));
-            }
-        }));
-};
-
-// Create composer.json with acf pro key to download wordpress plugins
-const setComposerfile = () => {
-    return src('composer_template.json')
-        .pipe(replace('@@acf_version', process.env.ACF_VERSION))
-        .pipe(replace('@@acf_pro_key', process.env.ACF_PRO_KEY))
-        .pipe(rename('composer.json'))
-        .pipe(dest('.'));
-};
-
 // Copy production htaccess
 const copyHtaccessProduction = () => {
     return src('node_modules/apache-server-configs/dist/.htaccess')
@@ -223,6 +86,18 @@ const addRelease = () => {
     return run(`git add CHANGELOG.md README.md package.json && git commit --amend --no-edit && git tag v${pkg.version} -m "Version ${pkg.version}" && git push -f && git push --tags`).exec();
 };
 
+// Setsup nucleus and the .env file
+import setupEnvironment from './gulp/setupenvironment';
+
+// Sets the wp-config.php file
+import setConfig from './gulp/setconfig';
+
+// Sets the composer.json file
+import setComposerfile from './gulp/setcomposerfile';
+
+// Updates composer packages
+import composerUpdate from './gulp/updatecomposer';
+
 // Checks and updates WP version
 import WPUpdate from './gulp/wpupdate';
 exports.WPUpdate = WPUpdate;
@@ -290,6 +165,10 @@ exports.push = push;
 import pull from './gulp/pull';
 exports.pull = pull;
 
+// Pull images from server
+import db from './gulp/db';
+exports.db = db;
+
 // Deploy theme to server
 import deploy from './gulp/deploy';
 exports.deploy = deploy;
@@ -300,4 +179,6 @@ export const build = series(cleanall, styles, images, makepot, copyfiles, copyph
 export const buildzip = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, copyHtaccessProduction, generatezip);
 export const bump = series(bumpPrompt, addRelease);
 export const release = addRelease;
+export const updateACFPro = series(setComposerfile, composerUpdate);
+
 export default dev;

@@ -1,3 +1,26 @@
+<a name="0.0.7"></a>
+## [0.0.7](https://github.com/marcoris/gulp-wordpress/compare/v0.0.6...v0.0.7) (2021-05-15)
+
+
+### Bug Fixes
+
+* Pull out the config folder ([331d1ec](https://github.com/marcoris/gulp-wordpress/commit/331d1ec))
+* remove export ([8d7e023](https://github.com/marcoris/gulp-wordpress/commit/8d7e023))
+* typo ([32aa5cb](https://github.com/marcoris/gulp-wordpress/commit/32aa5cb))
+* Update readme ([ce83df7](https://github.com/marcoris/gulp-wordpress/commit/ce83df7))
+
+
+### Features
+
+* Add docker command to import db dump ([dff557d](https://github.com/marcoris/gulp-wordpress/commit/dff557d))
+* Add phpmyadmin as docker container ([c64c8bf](https://github.com/marcoris/gulp-wordpress/commit/c64c8bf))
+* Add WordPress update gulp task and .env variables ([e1f9239](https://github.com/marcoris/gulp-wordpress/commit/e1f9239))
+* Add wp-cli container to system for updates ([d76c29d](https://github.com/marcoris/gulp-wordpress/commit/d76c29d))
+* Put gulp tasks in separate files ([ba5b766](https://github.com/marcoris/gulp-wordpress/commit/ba5b766))
+* Put gulp tasks in separate files ([eaeef74](https://github.com/marcoris/gulp-wordpress/commit/eaeef74))
+
+
+
 <a name="0.0.6"></a>
 ## [0.1.1](https://github.com/marcoris/gulp-wordpress/compare/v0.0.5...v0.1.1) (2021-03-12)
 
