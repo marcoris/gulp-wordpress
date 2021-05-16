@@ -7,7 +7,7 @@ import fs from 'fs';
 
 // Sets the configuration
 const setConfig = () => {
-    var cmd = new run.Command('sh getKeys.sh');
+    var cmd = new run.Command('sh ./shells/getKeys.sh');
     cmd.exec();
     var keys = fs.readFileSync('keys.php', 'utf-8');
 

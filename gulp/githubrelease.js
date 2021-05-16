@@ -3,7 +3,7 @@ import pkg from '../package.json';
 
 // Release to github
 const githubrelease = () => {
-    return run(`sh release.sh ${pkg.version}`).exec();
+    return run(`sh ./shells/release.sh ${pkg.version}`).exec();
 };
 
 module.exports = githubrelease;
