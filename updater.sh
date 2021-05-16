@@ -1,2 +1,2 @@
 #!/bin/bash
-npm update && composer update
+npm update && npm audit fix && composer update
