@@ -31,8 +31,8 @@ Make shure you have all accounts unlocked and remote mysql access activated
 | command | description |
 |---------|-------------|
 | `npm run installer` | Runs `docker-compose up -d`, `npm install`, `gulp setup`, `composer self-update`, `composer install` and `gulp` |
-| `npm run updater` | Runs `npm update` and `composer update` |
-| `npm run dbimport` | Runs `dbimport.sh` file for importing database dump |
+| `npm run updater` | Runs `npm update` and `npm audit fix` and `composer update` |
+| `npm run dbimport` | Runs `dbimport.sh` file for importing database *.sql.gz dump |
 
 ## Gulp Commands
 | command | description |
@@ -42,13 +42,14 @@ Make shure you have all accounts unlocked and remote mysql access activated
 | gulp build | Clens direcory, run styles, images, copy, scripts, addBanner copyplugins, copyHtaccessProduction, generates nucleus styleguide docs |
 | gulp buildZip | Cleans directory, run styles, images, copy, scripts, addBanner, and zipt the project for ulpoad |
 | gulp bump | Gives a bump version prompt to choose between patch, minor and major |
-| gulp release | Adds the bumped files, commit them with a release message and push them to github |
-| gulp dbimport | Runs the db import script. ().sql.gz file from wordpress plugin db migrations has to be in the sql directory |
+| gulp release | Adds the bumped files, commit them with a release message, add a tag and push it to github |
+| gulp dbimport | Runs the `dbimport.sh` script. A *.sql.gz file from wordpress plugin db migrations has to be in the sql directory |
 | gulp docs | Runs the nucleus styleguide building script |
 | gulp translate | Compiles .po to .mo file |
 | gulp WPUpdate | Checks the installed WordPress version and if it is not up to date install automatically the newest version. This can take several minutes! |
-| gulp pushfiles | *This function is not yet defined* |
-| gulp pushfiles | *This function is not yet defined* |
+| gulp pull | Pulls the remote `uploads` directory to local |
+| gulp push | Pushes the local `uploads` directory to remote |
+| gulp updateACFPro | Updates the ACF Pro plugin (ACF Pro version has to be set in `.env` file) |
 
 ## DB migration
 On the wordpress site go to Tools > Migrate DB. Fill in the required fields like: `https://hostname.ch -> http://localhost:8080` and export it (e.x. live2local). Just put the exported database dump file (*.gz) into the `sql` folder and run `npm run dbimport`.
