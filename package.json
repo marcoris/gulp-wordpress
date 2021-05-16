@@ -33,9 +33,9 @@
   "homepage": "https://github.com/marcoris/gulp-wordpress#readme",
   "website": "https://risdesign.ch",
   "devDependencies": {
-    "@babel/core": "^7.14.2",
-    "@babel/preset-env": "^7.14.2",
-    "@babel/register": "^7.13.16",
+    "@babel/core": "^7.11.6",
+    "@babel/preset-env": "^7.11.5",
+    "@babel/register": "^7.11.5",
     "apache-server-configs": "^3.2.1",
     "autoprefixer": "^9.8.6",
     "babel": "^6.23.0",
