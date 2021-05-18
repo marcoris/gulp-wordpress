@@ -3,7 +3,7 @@ require('dotenv').config();
 
 var EasyFtp = require('easy-ftp');
 var ftp = new EasyFtp();
-var options, remoteString;
+var options;
 
 // Check if the argument is production or staging
 if (typeof yargs.argv.prod !== 'undefined') {
@@ -12,14 +12,12 @@ if (typeof yargs.argv.prod !== 'undefined') {
         username: process.env.PRODUCTION_FTP_USER,
         password: process.env.PRODUCTION_FTP_PASS
     };
-    remoteString = process.env.PRODUCTION_URL;
 } else if (typeof yargs.argv.stage !== 'undefined') {
     options = {
         host: process.env.STAGING_FTP_HOST,
         username: process.env.STAGING_FTP_USER,
         password: process.env.STAGING_FTP_PASS
     };
-    remoteString = process.env.STAGING_URL;
 } else {
     console.log('Wrong parameter! Use --prod for production or --stage for staging');
 }
