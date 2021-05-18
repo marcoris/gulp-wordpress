@@ -23,6 +23,12 @@ const setupEnvironment = () => {
                 },
                 {
                     type: 'input',
+                    name: 'sshhost',
+                    message: 'SSH Host?',
+                    default: `${pkg.name}.com`
+                },
+                {
+                    type: 'input',
                     name: 'dbhost',
                     message: 'DB Host?',
                     default: 'mysql.stackcp.com'
@@ -66,6 +72,7 @@ const setupEnvironment = () => {
                     //value is in res.name
                     return src('.env')
                         .pipe(replace('hostinguser', res.hostinguser))
+                        .pipe(replace('sshhost', res.sshhost))
                         .pipe(replace('dbhost', res.dbhost))
                         .pipe(replace('dbport', res.dbport))
                         .pipe(replace('wpversion', res.wpversion))
