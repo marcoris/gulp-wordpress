@@ -3,14 +3,11 @@ import prompt from 'gulp-prompt';
 var EasyFtp = require('easy-ftp');
 var ftp = new EasyFtp();
 
-require('dotenv').config();
-
 var options = {
     host: process.env.PRODUCTION_FTP_HOST,
     username: process.env.PRODUCTION_FTP_USER,
     password: process.env.PRODUCTION_FTP_PASS
 };
-var remotePath = '/public_html/wp-content/uploads';
 
 const pull = () => {
     return src('.env')
@@ -26,7 +23,6 @@ const pull = () => {
                     username: process.env.STAGING_FTP_USER,
                     password: process.env.STAGING_FTP_PASS
                 };
-                remotePath = '/public_html/stage/wp-content/uploads';
             }
 
             var fails = 0;
@@ -36,10 +32,13 @@ const pull = () => {
                 }
             }
 
-            // Check if it can be deployed
+            // Check if it can be downloaded
             if (fails == 0) {
                 ftp.connect(options);
-                ftp.download(remotePath, './wwwroot/wp-content/uploads', function(err) {
+                ftp.download('wp-content/uploads', `${process.env.LOCAL_ROOT}/uploads`, function(err) {
+                    if (err) {
+                        console.log(err);
+                    }
                     ftp.close();
                 });
             } else {
