@@ -1,8 +1,6 @@
 // Gulp plugins
 import {src, dest, series} from 'gulp';
 
-require('dotenv').config();
-
 // Copy production htaccess
 const copyHtaccessProduction = () => {
     return src('node_modules/apache-server-configs/dist/.htaccess')
@@ -25,7 +23,15 @@ import composerUpdate from './gulp/updatecomposer';
 import WPUpdate from './gulp/wpupdate';
 exports.WPUpdate = WPUpdate;
 
-// DB import
+// Get the generated remote sql file
+import getSql from './gulp/getsql';
+exports.getSql = getSql;
+
+// Replace productive or staging urls to localhost
+import replaceLocal from './gulp/replacelocal';
+exports.replaceLocal = replaceLocal;
+
+// Import database
 import dbimport from './gulp/dbimport';
 exports.dbimport = dbimport;
 
@@ -87,10 +93,6 @@ exports.push = push;
 // Pull images from server
 import pull from './gulp/pull';
 exports.pull = pull;
-
-// Pull images from server
-import db from './gulp/db';
-exports.db = db;
 
 // Deploy theme to server
 import deploy from './gulp/deploy';
