@@ -3,6 +3,8 @@ import prompt from 'gulp-prompt';
 var EasyFtp = require('easy-ftp');
 var ftp = new EasyFtp();
 
+require('dotenv').config();
+
 var options = {
     host: process.env.PRODUCTION_FTP_HOST,
     username: process.env.PRODUCTION_FTP_USER,
@@ -11,13 +13,19 @@ var options = {
 
 const push = () => {
     return src('.env')
-        .pipe(prompt.prompt({
-            type: 'checkbox',
-            name: 'config',
+        .pipe(prompt.prompt([{
+            type: 'list',
+            name: 'pushing',
             message: 'Pushing to?',
             choices: ['staging', 'production']
-        }, function(res) {
-            if (res.config[0] == 'staging') {
+        },
+        {
+            type: 'list',
+            name: 'data',
+            message: 'Folders?',
+            choices: ['Themes', 'Uploads', 'Themes and Uploads']
+        }], function(res) {
+            if (res.pushing == 'staging') {
                 options = {
                     host: process.env.STAGING_FTP_HOST,
                     username: process.env.STAGING_FTP_USER,
@@ -32,17 +40,44 @@ const push = () => {
                 }
             }
 
-            // Check if it can be deployed
+            // Add to array
+            var dirArray = [];
+            switch (res.data) {
+                case 'Themes':
+                    dirArray.push({
+                        local: `./${process.env.LOCAL_ROOT}/themes`,
+                        remote: '/wp-content/themes'
+                    });
+                    break;
+                case 'Uploads':
+                    dirArray.push({
+                        local: `./${process.env.LOCAL_ROOT}/uploads`,
+                        remote: 'wp-content/uploads'
+                    });
+                    break;
+                default:
+                    dirArray.push({
+                        local: `./${process.env.LOCAL_ROOT}/themes`,
+                        remote: '/wp-content/themes'
+                    });
+                    dirArray.push({
+                        local: `./${process.env.LOCAL_ROOT}/uploads`,
+                        remote: 'wp-content/uploads'
+                    });
+                    break;
+            }
+
+            // Check if it can be pushed
             if (fails == 0) {
                 ftp.connect(options);
-                ftp.upload(`${process.env.LOCAL_ROOT}/uploads`, 'wp-content/uploads', function(err) {
+                ftp.upload(dirArray, '/', function(err) {
                     if (err) {
                         console.log(err);
                     }
                     ftp.close();
                 });
             } else {
-                console.log(`\n>>> Credentials of ${res.config[0]} are missing!\n`);
+                console.log(`\n>>> Credentials of ${res.config} are missing!\n`);
             }
         }));
 };
