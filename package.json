@@ -10,8 +10,8 @@
     "start": "gulp",
     "build": "gulp build --prod",
     "dbimport": "sh ./shells/dbimport.sh",
-    "importRemoteDB-prod": "sh ./shells/dbmigration.sh prod && gulp getSql --prod && gulp replaceDBLocal --prod && sh ./shells/dbimport.sh",
-    "importRemoteDB-stage": "sh ./shells/dbmigration.sh stage && gulp getSql --stage && gulp replaceDBLocal --stage && sh ./shells/dbimport.sh"
+    "importRemoteDB-prod": "sh ./shells/dbmigration.sh prod && gulp getSql --prod && gulp replaceDBUrls --prod=local && sh ./shells/dbimport.sh",
+    "importRemoteDB-stage": "sh ./shells/dbmigration.sh stage && gulp getSql --stage && gulp replaceDBUrls --stage=local && sh ./shells/dbimport.sh"
   },
   "repository": {
     "type": "git",
