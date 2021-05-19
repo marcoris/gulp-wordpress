@@ -31,10 +31,6 @@ exports.getSql = getSql;
 import replaceLocal from './gulp/replacelocal';
 exports.replaceLocal = replaceLocal;
 
-// Import database
-import dbimport from './gulp/dbimport';
-exports.dbimport = dbimport;
-
 // Rename textdomain
 import renametextdomain from './gulp/renametextdomain';
 
