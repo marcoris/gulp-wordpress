@@ -6,13 +6,12 @@
   "main": "index.js",
   "url": "risdesign.ch",
   "scripts": {
-    "installer": "sh ./shells/installer.sh",
     "updater": "sh ./shells/updater.sh",
     "start": "gulp",
     "build": "gulp build --prod",
     "dbimport": "sh ./shells/dbimport.sh",
-    "importRemoteDB-prod": "sh ./shells/dbmigration.sh prod && gulp getSql --prod && gulp replaceLocal --prod && sh ./shells/dbimport.sh",
-    "importRemoteDB-stage": "sh ./shells/dbmigration.sh stage && gulp getSql --stage && gulp replaceLocal --stage && sh ./shells/dbimport.sh"
+    "importRemoteDB-prod": "sh ./shells/dbmigration.sh prod && gulp getSql --prod && gulp replaceDBLocal --prod && sh ./shells/dbimport.sh",
+    "importRemoteDB-stage": "sh ./shells/dbmigration.sh stage && gulp getSql --stage && gulp replaceDBLocal --stage && sh ./shells/dbimport.sh"
   },
   "repository": {
     "type": "git",

@@ -28,8 +28,8 @@ import getSql from './gulp/getsql';
 exports.getSql = getSql;
 
 // Replace productive or staging urls to localhost
-import replaceLocal from './gulp/replacelocal';
-exports.replaceLocal = replaceLocal;
+import replaceDBLocal from './gulp/replaceDBLocal';
+exports.replaceDBLocal = replaceDBLocal;
 
 // Rename textdomain
 import renametextdomain from './gulp/renametextdomain';
