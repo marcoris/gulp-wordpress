@@ -8,6 +8,12 @@ import fs from 'fs';
 
 // Set nucleus styleguide config and .env file
 const setupEnvironment = () => {
+    var cwdp = process.cwd();
+    var cwd = cwdp.split('\\');
+    if (cwd.length > 0) {
+        cwd = cwd[cwd.length - 1];
+    }
+
     src('./config/config.nucleus.json')
         .pipe(replace('@@themename', pkg.name))
         .pipe(dest('.'));
@@ -25,19 +31,13 @@ const setupEnvironment = () => {
                     type: 'input',
                     name: 'sshhost',
                     message: 'SSH Host?',
-                    default: `${pkg.name}.com`
+                    default: 'ssh.stackcp.com'
                 },
                 {
                     type: 'input',
                     name: 'dbhost',
                     message: 'DB Host?',
                     default: 'mysql.stackcp.com'
-                },
-                {
-                    type: 'input',
-                    name: 'dbport',
-                    message: 'DB Port?',
-                    default: '56311'
                 },
                 {
                     type: 'input',
@@ -55,7 +55,7 @@ const setupEnvironment = () => {
                     type: 'input',
                     name: 'dockername',
                     message: 'Dockername?',
-                    default: 'gulpwordpress'
+                    default: cwd
                 },
                 {
                     type: 'input',

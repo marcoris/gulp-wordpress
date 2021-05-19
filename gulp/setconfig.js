@@ -5,6 +5,8 @@ import run from 'gulp-run';
 
 import fs from 'fs';
 
+require('dotenv').config();
+
 // Sets the configuration
 const setConfig = () => {
     var cmd = new run.Command('sh ./shells/getKeys.sh');
@@ -13,12 +15,12 @@ const setConfig = () => {
 
     return src('./config/wp-config.php')
         .pipe(prompt.prompt({
-            type: 'checkbox',
+            type: 'list',
             name: 'config',
             message: 'Setup for?',
             choices: ['local', 'staging', 'production']
         }, function(res) {
-            if (res.config[0] == 'staging') {
+            if (res.config == 'staging') {
                 src('./config/wp-config.php')
                     .pipe(replace('@@db_name', process.env.STAGING_DB_NAME))
                     .pipe(replace('@@db_user', process.env.STAGING_DB_USER))
@@ -31,7 +33,7 @@ const setConfig = () => {
                     .pipe(replace('@@disallow_file_mods', process.env.STAGING_DISALLOW_FILE_MODS))
                     .pipe(replace('@@wp_allow_multisite', process.env.STAGING_WP_ALLOW_MULTISITE))
                     .pipe(dest('wwwroot'));
-            } else if (res.config[0] == 'production') {
+            } else if (res.config == 'production') {
                 src('./config/wp-config.php')
                     .pipe(replace('@@db_name', process.env.PRODUCTION_DB_NAME))
                     .pipe(replace('@@db_user', process.env.PRODUCTION_DB_USER))
