@@ -1,5 +1,6 @@
 import {src} from 'gulp';
 import prompt from 'gulp-prompt';
+import pkg from '../package.json';
 var EasyFtp = require('easy-ftp');
 var ftp = new EasyFtp();
 
@@ -22,8 +23,8 @@ const push = () => {
         {
             type: 'list',
             name: 'data',
-            message: 'Folders?',
-            choices: ['Themes', 'Uploads', 'Themes and Uploads']
+            message: 'Folder(s)?',
+            choices: [`Theme ${pkg.name}`, 'Uploads', 'Both']
         }], function(res) {
             if (res.pushing == 'staging') {
                 options = {
@@ -43,9 +44,9 @@ const push = () => {
             // Add to array
             var dirArray = [];
             switch (res.data) {
-                case 'Themes':
+                case `Theme ${pkg.name}`:
                     dirArray.push({
-                        local: `./${process.env.LOCAL_ROOT}/themes`,
+                        local: `./${process.env.LOCAL_ROOT}/themes/${pkg.name}`,
                         remote: '/wp-content/themes'
                     });
                     break;
@@ -57,7 +58,7 @@ const push = () => {
                     break;
                 default:
                     dirArray.push({
-                        local: `./${process.env.LOCAL_ROOT}/themes`,
+                        local: `./${process.env.LOCAL_ROOT}/themes/${pkg.name}`,
                         remote: '/wp-content/themes'
                     });
                     dirArray.push({
