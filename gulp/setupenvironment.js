@@ -70,11 +70,10 @@ const setupEnvironment = () => {
                     default: ''
                 }], function(res) {
                     //value is in res.name
-                    return src('.env')
+                    src('.env')
                         .pipe(replace('hostinguser', res.hostinguser))
                         .pipe(replace('sshhost', res.sshhost))
                         .pipe(replace('dbhost', res.dbhost))
-                        .pipe(replace('dbport', res.dbport))
                         .pipe(replace('wpversion', res.wpversion))
                         .pipe(replace('locale', res.locale))
                         .pipe(replace('dockername', res.dockername))

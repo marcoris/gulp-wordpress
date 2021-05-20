@@ -10,9 +10,6 @@ const copyHtaccessProduction = () => {
 // Setsup nucleus and the .env file
 import setupEnvironment from './gulp/setupenvironment';
 
-// Sets the wp-config.php file
-import setConfig from './gulp/setconfig';
-
 // Sets the composer.json file
 import setComposerfile from './gulp/setcomposerfile';
 
@@ -98,13 +95,17 @@ exports.shot = shot;
 import deploy from './gulp/deploy';
 exports.deploy = deploy;
 
+// Deploy theme to server
+import setup from './gulp/setup';
+exports.setup = setup;
+
 // Bumps version
 import bumpPrompt from './gulp/bump';
 
 // Release to github with tags
 import githubrelease from './gulp/githubrelease';
 
-export const setup = series(setupEnvironment, setConfig, setComposerfile);
+export const setupFirst = series(setupEnvironment, setup, setComposerfile);
 export const dev = series(clean, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, plugins, docs, serve, watchForChanges);
 export const build = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, plugins, copyHtaccessProduction, docs);
 export const buildzip = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, copyHtaccessProduction, generatezip);
