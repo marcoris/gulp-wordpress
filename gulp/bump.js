@@ -2,13 +2,15 @@ import {src, dest, series} from 'gulp';
 import bumpVersion from 'gulp-bump';
 import conventionalChangelog from 'gulp-conventional-changelog';
 import prompt from 'gulp-prompt';
+import run from 'gulp-run';
+import pkg from '../package.json';
+
+var semver = require('semver');
 
 // Bump version x.x.1
 const bumpPatch = () => {
     return src(['./package.json', './README.md'])
-        .pipe(bumpVersion({
-            type: 'patch'
-        }))
+        .pipe(bumpVersion())
         .pipe(dest('.'));
 };
 
@@ -42,22 +44,49 @@ const changelog = () => {
         .pipe(dest('.'));
 };
 
+// Github release patch
+const githubreleasePatch = (done) => {
+    // increment version
+    var newVer = semver.inc(pkg.version, 'patch');
+    run(`sh ./shells/githubrelease.sh ${newVer}`).exec();
+
+    done();
+};
+
+// Github release patch
+const githubreleaseMinor = (done) => {
+    // increment version
+    var newVer = semver.inc(pkg.version, 'minor');
+    run(`sh ./shells/githubrelease.sh ${newVer}`).exec();
+
+    done();
+};
+
+// Github release major
+const githubreleaseMajor = (done) => {
+    // increment version
+    var newVer = semver.inc(pkg.version, 'major');
+    run(`sh ./shells/githubrelease.sh ${newVer}`).exec();
+
+    done();
+};
+
 // Bump up project version
 const bumpPrompt = () => {
-    const runPatch = series(bumpPatch, changelog);
-    const runMinor = series(bumpMinor, changelog);
-    const runMajor = series(bumpMajor, changelog);
+    const runPatch = series(bumpPatch, changelog, githubreleasePatch);
+    const runMinor = series(bumpMinor, changelog, githubreleaseMinor);
+    const runMajor = series(bumpMajor, changelog, githubreleaseMajor);
 
     return src('./gulpfile.babel.js')
         .pipe(prompt.prompt({
-            type: 'checkbox',
+            type: 'list',
             name: 'bump',
-            message: 'What type of bump would you like to do?',
+            message: `Bumping v${pkg.version} up`,
             choices: ['patch', 'minor', 'major']
         }, function(res) {
-            if (res.bump[0] == 'major') {
+            if (res.bump == 'major') {
                 runMajor();
-            } else if (res.bump[0] == 'minor') {
+            } else if (res.bump == 'minor') {
                 runMinor();
             } else {
                 runPatch();
