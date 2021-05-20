@@ -1,3 +1,38 @@
+<a name="0.0.8"></a>
+## [0.0.8](https://github.com/marcoris/gulpwordpress/compare/v0.0.7...v0.0.8) (2021-05-20)
+
+
+### Bug Fixes
+
+* Adding dotenv ([fe4bd37](https://github.com/marcoris/gulpwordpress/commit/fe4bd37))
+* Cleanup code ([7e7e50c](https://github.com/marcoris/gulpwordpress/commit/7e7e50c))
+* Cleanup code ([a3ac268](https://github.com/marcoris/gulpwordpress/commit/a3ac268))
+* Cleanup code and add prod condition ([5d8bee5](https://github.com/marcoris/gulpwordpress/commit/5d8bee5))
+* getSql task ([56c9c48](https://github.com/marcoris/gulpwordpress/commit/56c9c48))
+* Import local sql file in database ([e371a13](https://github.com/marcoris/gulpwordpress/commit/e371a13))
+* Improve the setup workflow ([d2b164b](https://github.com/marcoris/gulpwordpress/commit/d2b164b))
+* Only pulling and pushing the theme ([662d986](https://github.com/marcoris/gulpwordpress/commit/662d986))
+* Portforwarding ([fccf3c2](https://github.com/marcoris/gulpwordpress/commit/fccf3c2))
+* Push and pull tasks ([149dee5](https://github.com/marcoris/gulpwordpress/commit/149dee5))
+* Remove unnecessary variable ([bf5bb17](https://github.com/marcoris/gulpwordpress/commit/bf5bb17))
+* Rename replaceDBLocal task ([d874590](https://github.com/marcoris/gulpwordpress/commit/d874590))
+* Rename repository ([e8d2cf6](https://github.com/marcoris/gulpwordpress/commit/e8d2cf6))
+* Rename repository ([12d2bc2](https://github.com/marcoris/gulpwordpress/commit/12d2bc2))
+* Rename to replaceDBUrls task ([a475be7](https://github.com/marcoris/gulpwordpress/commit/a475be7))
+* Run getKeys in silent mode ([2bb7d11](https://github.com/marcoris/gulpwordpress/commit/2bb7d11))
+* Updated screenshot size ([7ef3888](https://github.com/marcoris/gulpwordpress/commit/7ef3888))
+
+
+### Features
+
+* Add generate screenshot.png task ([ace6511](https://github.com/marcoris/gulpwordpress/commit/ace6511))
+* Add getSql module to get the sql file ([9eb64d5](https://github.com/marcoris/gulpwordpress/commit/9eb64d5))
+* Add remote to local database import ([a3d5062](https://github.com/marcoris/gulpwordpress/commit/a3d5062))
+* Add replace remote to local ([198ea9e](https://github.com/marcoris/gulpwordpress/commit/198ea9e))
+* Import remote db to local db ([cf54f81](https://github.com/marcoris/gulpwordpress/commit/cf54f81))
+
+
+
 <a name="0.0.7"></a>
 ## [0.0.7](https://github.com/marcoris/gulp-wordpress/compare/v0.0.6...v0.0.7) (2021-05-15)
 
