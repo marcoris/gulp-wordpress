@@ -103,14 +103,14 @@ exports.setup = setup;
 import bumpPrompt from './gulp/bump';
 
 // Release to github with tags
-import githubrelease from './gulp/githubrelease';
+// import githubrelease from './gulp/githubrelease';
+// exports.githubrelease = githubrelease;
 
 export const setupFirst = series(setupEnvironment, setup, setComposerfile);
 export const dev = series(clean, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, plugins, docs, serve, watchForChanges);
 export const build = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, plugins, copyHtaccessProduction, docs);
 export const buildzip = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, copyHtaccessProduction, generatezip);
-export const bump = series(bumpPrompt, githubrelease);
-export const release = githubrelease;
+export const bump = series(bumpPrompt);
 export const updateACFPro = series(setComposerfile, composerUpdate);
 
 export default dev;
