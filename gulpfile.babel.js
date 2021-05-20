@@ -90,6 +90,10 @@ exports.push = push;
 import pull from './gulp/pull';
 exports.pull = pull;
 
+// Generates the screenshot.png - Cheeeeese
+import shot from './gulp/shot';
+exports.shot = shot;
+
 // Deploy theme to server
 import deploy from './gulp/deploy';
 exports.deploy = deploy;
