@@ -77,8 +77,7 @@ cat ~/.ssh/id_rsa.pub | clip
 | gulp dev | Default gulp command, runs cleaner, docs, makepot, serve and watchers |
 | gulp build | Builds the theme in cleared directories |
 | gulp buildZip | Builds the theme in cleared directories and zip it |
-| gulp bump | Gives a bump version prompt to choose between patch, minor and major |
-| gulp githubrelease | Adds the bumped files (`CHANGELOG.md`, `README.md`, `package.json`), commit them with a release message, add a tag and push it to github |
+| gulp bump | Gives a bump version prompt to choose between patch, minor and major and adds the bumped files (`CHANGELOG.md`, `README.md`, `package.json`), commit them with a release message, add a tag and push it to github |
 | gulp WPUpdate | Checks the installed WordPress version and if it is not up to date install automatically the newest version. This can take several minutes! |
 | gulp push | Pushes the local `themes`, `uploads` or `both` directories to remote |
 | gulp pull | Pulls the remote `themes`, `uploads` or `both` directories to local |
@@ -91,6 +90,7 @@ cat ~/.ssh/id_rsa.pub | clip
 | gulp updateACFPro | Updates the ACF Pro plugin (ACF Pro version has to be set in `.env` file) |
 
 <hr>
+
 ## The thing with the database :crystal_ball:
 To import the remote database into the local database run:
 ```bash

@@ -64,7 +64,7 @@ import clean from './gulp/clean';
 // Cleans the themes and build directory
 import cleanall from './gulp/cleanall';
 
-// Images task
+// Images task to minimize
 import images from './gulp/images';
 
 // Plugins task
@@ -101,10 +101,6 @@ exports.setup = setup;
 
 // Bumps version
 import bumpPrompt from './gulp/bump';
-
-// Release to github with tags
-// import githubrelease from './gulp/githubrelease';
-// exports.githubrelease = githubrelease;
 
 export const setupFirst = series(setupEnvironment, setup, setComposerfile);
 export const dev = series(clean, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, plugins, docs, serve, watchForChanges);
