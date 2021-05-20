@@ -1,4 +1,4 @@
-# gulpwordpress version 0.0.8
+# gulpwordpress version 0.0.9
 <p align="center">
     <img height="150" src="gulp.png">
     <img height="150" src="wordpress.png">
