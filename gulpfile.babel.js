@@ -1,11 +1,5 @@
 // Gulp plugins
-import {src, dest, series} from 'gulp';
-
-// Copy production htaccess
-const copyHtaccessProduction = () => {
-    return src('node_modules/apache-server-configs/dist/.htaccess')
-        .pipe(dest('wwwroot'));
-};
+import {series} from 'gulp';
 
 // Setsup nucleus and the .env file
 import setupEnvironment from './gulp/setupenvironment';
@@ -95,7 +89,7 @@ exports.shot = shot;
 import deploy from './gulp/deploy';
 exports.deploy = deploy;
 
-// Deploy theme to server
+// Setup wp-config.php
 import setup from './gulp/setup';
 exports.setup = setup;
 
@@ -104,8 +98,8 @@ import bumpPrompt from './gulp/bump';
 
 export const setupFirst = series(setupEnvironment, setup, setComposerfile);
 export const dev = series(clean, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, plugins, docs, serve, watchForChanges);
-export const build = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, plugins, copyHtaccessProduction, docs);
-export const buildzip = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, copyHtaccessProduction, generatezip);
+export const build = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, plugins, docs);
+export const buildzip = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, generatezip);
 export const bump = series(bumpPrompt);
 export const updateACFPro = series(setComposerfile, composerUpdate);
 
