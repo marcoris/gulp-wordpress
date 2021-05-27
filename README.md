@@ -5,6 +5,7 @@
 </p>
 
 Development environment with gulp and docker for developing and deploying WordPress themes.
+
 [![GitHub commit](https://img.shields.io/github/last-commit/marcoris/gulpwordpress)](https://github.com/marcoris/gulpwordpress/commits/master) ![GitHub commit activity](https://img.shields.io/github/commit-activity/4w/marcoris/gulpwordpress) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/marcoris/gulpwordpress) ![GitHub issues](https://img.shields.io/github/issues/marcoris/gulpwordpress) ![GitHub pull requests](https://img.shields.io/github/issues-pr/marcoris/gulpwordpress) ![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/marcoris/gulpwordpress/master) ![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/marcoris/gulpwordpress) ![GitHub](https://img.shields.io/github/license/marcoris/gulpwordpress)
 
 # Prerequirements
