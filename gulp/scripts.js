@@ -7,7 +7,7 @@ import gulpif from 'gulp-if';
 import pkg from '../package.json';
 import yargs from 'yargs';
 
-const PRODUCTION = yargs.argv.prod;
+const PRODUCTION = yargs.argv.prod | yargs.argv.stage;
 
 // Scripts
 const scripts = () => {

@@ -11,7 +11,7 @@ import pkg from '../package.json';
 import browserSync from 'browser-sync';
 import yargs from 'yargs';
 
-const PRODUCTION = yargs.argv.prod;
+const PRODUCTION = yargs.argv.prod | yargs.argv.stage;
 const server = browserSync.create();
 
 // Styles
