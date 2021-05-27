@@ -9,9 +9,21 @@
     "updater": "sh ./shells/updater.sh",
     "start": "gulp",
     "build": "gulp build --prod",
+    "gettableprefix": "sh ./shells/gettableprefix.sh",
+    "gettableprefix:stage": "npm run gettableprefix stage",
+    "dbexport": "sh ./shells/dbexport.sh",
+    "dbexport:local": "local",
+    "dbexport:stage": "stage",
+    "dbexport:prod": "prod",
     "dbimport": "sh ./shells/dbimport.sh",
-    "importRemoteDB-prod": "sh ./shells/dbmigration.sh prod && gulp getSql --prod && gulp replaceDBUrls --prod=local && sh ./shells/dbimport.sh",
-    "importRemoteDB-stage": "sh ./shells/dbmigration.sh stage && gulp getSql --stage && gulp replaceDBUrls --stage=local && sh ./shells/dbimport.sh"
+    "dbimport:local": "local",
+    "dbimport:stage": "stage",
+    "dbimport:prod": "prod",
+    "deploy": "sh ./shells/deploy.sh",
+    "deploy:stage": "stage",
+    "deploy:prod": "prod",
+    "importRemoteDB-stage": "npm run dbexport stage && gulp getSql --stage && gulp replaceDBStrings --stage=local && npm run dbimport local",
+    "importRemoteDB-prod": "npm run dbexport prod && gulp getSql --prod && gulp replaceDBStrings --prod=local && npm run dbimport local"
   },
   "repository": {
     "type": "git",
