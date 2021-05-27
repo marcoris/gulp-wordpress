@@ -101,8 +101,8 @@ import bumpPrompt from './gulp/bump';
 
 export const firstSetup = series(setupEnvironment, setupWPConfig, setComposerfile);
 export const dev = series(clean, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, plugins, docs, serve, watchForChanges);
-export const build = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, plugins, docs);
-export const buildzip = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, generatezip);
+export const build = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, plugins, docs, shot);
+export const buildzip = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, shot, generatezip);
 export const bump = series(bumpPrompt);
 export const updateACFPro = series(setComposerfile, composerUpdate);
 
