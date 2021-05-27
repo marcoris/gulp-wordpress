@@ -12,21 +12,23 @@ var options = {
     password: process.env.PRODUCTION_FTP_PASS
 };
 
-const push = () => {
+var dirArray = [];
+
+const pull = () => {
     return src('.env')
         .pipe(prompt.prompt([{
             type: 'list',
             name: 'pushing',
             message: 'Pushing to?',
-            choices: ['staging', 'production']
+            choices: ['Staging', 'Production']
         },
         {
             type: 'list',
             name: 'data',
-            message: 'Folder(s)?',
-            choices: [`Theme ${pkg.name}`, 'Uploads', 'Both']
+            message: 'What?',
+            choices: [`Theme ${pkg.name}`, 'Uploads', `Theme ${pkg.name} and uploads`, 'Just the sql file']
         }], function(res) {
-            if (res.pushing == 'staging') {
+            if (res.pushing == 'Staging') {
                 options = {
                     host: process.env.STAGING_FTP_HOST,
                     username: process.env.STAGING_FTP_USER,
@@ -41,8 +43,6 @@ const push = () => {
                 }
             }
 
-            // Add to array
-            var dirArray = [];
             switch (res.data) {
                 case `Theme ${pkg.name}`:
                     dirArray.push({
@@ -56,7 +56,7 @@ const push = () => {
                         remote: 'wp-content/uploads'
                     });
                     break;
-                default:
+                case `Theme ${pkg.name} and uploads`:
                     dirArray.push({
                         local: `./${process.env.LOCAL_ROOT}/themes/${pkg.name}`,
                         remote: '/wp-content/themes'
@@ -66,9 +66,24 @@ const push = () => {
                         remote: 'wp-content/uploads'
                     });
                     break;
+                default:
+                    if (res.from == 'Staging') {
+                        // Add stage sql file
+                        dirArray.push({
+                            local: './sql/stage.sql',
+                            remote: '/sql/stage.sql'
+                        });
+                    } else {
+                        // Add production sql file
+                        dirArray.push({
+                            local: './sql/prod.sql',
+                            remote: '/sql/prod.sql'
+                        });
+                    }
+                    break;
             }
 
-            // Check if it can be pushed
+            // Check if it can be uploaded
             if (fails == 0) {
                 ftp.connect(options);
                 ftp.upload(dirArray, '/', function(err) {
@@ -78,9 +93,9 @@ const push = () => {
                     ftp.close();
                 });
             } else {
-                console.log(`\n>>> Credentials of ${res.config} are missing!\n`);
+                console.log(`\n>>> Credentials of ${res.config[0]} are missing!\n`);
             }
         }));
 };
 
-module.exports = push;
+module.exports = pull;

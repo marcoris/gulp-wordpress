@@ -12,21 +12,23 @@ var options = {
     password: process.env.PRODUCTION_FTP_PASS
 };
 
+var dirArray = [];
+
 const pull = () => {
     return src('.env')
         .pipe(prompt.prompt([{
             type: 'list',
             name: 'pulling',
             message: 'Pulling from?',
-            choices: ['staging', 'production']
+            choices: ['Staging', 'Production']
         },
         {
             type: 'list',
             name: 'data',
             message: 'What?',
-            choices: [`Theme ${pkg.name}`, 'Uploads', 'Both']
+            choices: [`Theme ${pkg.name}`, 'Uploads', `Theme ${pkg.name} and uploads`, 'Just the sql file']
         }], function(res) {
-            if (res.pulling == 'staging') {
+            if (res.pulling == 'Staging') {
                 options = {
                     host: process.env.STAGING_FTP_HOST,
                     username: process.env.STAGING_FTP_USER,
@@ -41,8 +43,6 @@ const pull = () => {
                 }
             }
 
-            // Add to array
-            var dirArray = [];
             switch (res.data) {
                 case `Theme ${pkg.name}`:
                     dirArray.push({
@@ -56,7 +56,7 @@ const pull = () => {
                         remote: 'wp-content/uploads'
                     });
                     break;
-                default:
+                case `Theme ${pkg.name} and uploads`:
                     dirArray.push({
                         local: `./${process.env.LOCAL_ROOT}/themes/${pkg.name}`,
                         remote: '/wp-content/themes'
@@ -65,6 +65,21 @@ const pull = () => {
                         local: `./${process.env.LOCAL_ROOT}/uploads`,
                         remote: 'wp-content/uploads'
                     });
+                    break;
+                default:
+                    if (res.from == 'Staging') {
+                        // Add stage sql file
+                        dirArray.push({
+                            local: './sql/stage.sql',
+                            remote: '/sql/stage.sql'
+                        });
+                    } else {
+                        // Add production sql file
+                        dirArray.push({
+                            local: './sql/prod.sql',
+                            remote: '/sql/prod.sql'
+                        });
+                    }
                     break;
             }
 
