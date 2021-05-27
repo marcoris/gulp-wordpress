@@ -1,52 +1,100 @@
+var EasyFtp = require('easy-ftp');
 import {src} from 'gulp';
 import prompt from 'gulp-prompt';
-import pkg from '../package.json';
-var EasyFtp = require('easy-ftp');
 var ftp = new EasyFtp();
 
+import yargs from 'yargs';
 require('dotenv').config();
 
 var options = {
-    host: process.env.PRODUCTION_FTP_HOST,
-    username: process.env.PRODUCTION_FTP_USER,
-    password: process.env.PRODUCTION_FTP_PASS
+    type: 'sftp'
 };
-var destinationPath = process.env.PRODUCTION_FTP_DEST;
+var dirArray = [];
 
-const deploy = () => {
-    return src('.env')
-        .pipe(prompt.prompt({
-            type: 'checkbox',
-            name: 'config',
-            message: 'Deploying for?',
-            choices: ['staging', 'production']
-        }, function(res) {
-            if (res.config[0] == 'staging') {
-                options = {
-                    host: process.env.STAGING_FTP_HOST,
-                    username: process.env.STAGING_FTP_USER,
-                    password: process.env.STAGING_FTP_PASS
-                };
-                destinationPath = process.env.STAGING_FTP_DEST;
-            }
-
-            var fails = 0;
-            for (const [key, value] of Object.entries(options)) {
-                if (`${value}` == '') {
-                    fails++;
+const deploy = (done) => {
+    if (typeof yargs.argv.prod === 'undefined' && typeof yargs.argv.stage === 'undefined') {
+        console.log('Wrong parameter!');
+        console.log('gulp deploy --stage for deploying to stage');
+        console.log('gulp deploy --prod for deploying to production');
+    } else {
+        src('./wwwroot')
+            .pipe(prompt.prompt({
+                type: 'list',
+                name: 'deploying',
+                message: 'What to deploy?',
+                choices: [`Uploads and ${process.env.DOCKER_NAME} theme`, 'wwwroot']
+            }, function(res) {
+                // If deploying is wwwroot
+                if (res.deploying == 'wwwroot') {
+                    // Add wwwroot
+                    dirArray.push({
+                        local: './wwwroot',
+                        remote: '/'
+                    });
+                } else if (res.deploying == `Uploads and ${process.env.DOCKER_NAME} theme`) {
+                    // Add uploads and theme
+                    dirArray.push({
+                        local: `./${process.env.LOCAL_ROOT}/uploads`,
+                        remote: 'wp-content/uploads'
+                    },
+                    {
+                        local: `./${process.env.LOCAL_ROOT}/themes/${process.env.DOCKER_NAME}`,
+                        remote: '/wp-content/themes'
+                    });
                 }
-            }
 
-            // Check if it can be deployed
-            if (fails == 0) {
-                ftp.connect(options);
-                ftp.upload(`./wwwroot/wp-content/themes/${pkg.name}`, destinationPath, function(err) {
-                    ftp.close();
-                });
-            } else {
-                console.log(`\n>>> Credentials of ${res.config[0]} are missing!\n`);
-            }
-        }));
+                var fails = 0;
+                if (typeof yargs.argv.stage !== 'undefined') {
+                    // Set stage ftp options
+                    options = {
+                        host: process.env.STAGING_FTP_HOST,
+                        username: process.env.STAGING_FTP_USER,
+                        password: process.env.STAGING_FTP_PASS
+                    };
+
+                    // Add stage sql file
+                    dirArray.push({
+                        local: './sql/stage.sql',
+                        remote: '/sql/stage.sql'
+                    });
+                } else {
+                    // Set production ftp options
+                    options = {
+                        host: process.env.PRODUCTION_FTP_HOST,
+                        username: process.env.PRODUCTION_FTP_USER,
+                        password: process.env.PRODUCTION_FTP_PASS
+                    };
+
+                    // Add production sql file
+                    dirArray.push({
+                        local: './sql/prod.sql',
+                        remote: '/sql/prod.sql'
+                    });
+                }
+
+                // Check credentials
+                for (const [key, value] of Object.entries(options)) {
+                    if (`${value}` == '') {
+                        fails++;
+                    }
+                }
+
+                // Check if it can be deployed
+                if (fails == 0) {
+                    ftp.connect(options);
+                    ftp.upload(dirArray, '/', function(err) {
+                        if (err) {
+                            console.log(err);
+                        }
+                        ftp.close();
+                    });
+                } else {
+                    console.log(`\n>>> Credentials of ${yargs.argv} are missing!\n`);
+                }
+            }));
+    }
+
+    done();
 };
 
 module.exports = deploy;

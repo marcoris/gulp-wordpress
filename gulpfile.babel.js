@@ -19,8 +19,8 @@ import getSql from './gulp/getsql';
 exports.getSql = getSql;
 
 // Replace productive or staging urls to localhost
-import replaceDBUrls from './gulp/replaceDBUrls';
-exports.replaceDBUrls = replaceDBUrls;
+import replaceDBStrings from './gulp/replaceDBStrings';
+exports.replaceDBStrings = replaceDBStrings;
 
 // Rename textdomain
 import renametextdomain from './gulp/renametextdomain';
@@ -48,9 +48,11 @@ import serve from './gulp/serve';
 
 // Styles task
 import styles from './gulp/styles';
+exports.styles = styles;
 
 // Scripts task
 import scripts from './gulp/scripts';
+exports.scripts = scripts;
 
 // Cleans the themes directory
 import clean from './gulp/clean';
@@ -60,6 +62,7 @@ import cleanall from './gulp/cleanall';
 
 // Images task to minimize
 import images from './gulp/images';
+exports.images = images;
 
 // Plugins task
 import plugins from './gulp/plugins';
@@ -73,11 +76,11 @@ import copyfiles from './gulp/copyfiles';
 // Generate theme as zip to upload
 import generatezip from './gulp/generatezip';
 
-// Push images to server
+// Push files to server
 import push from './gulp/push';
 exports.push = push;
 
-// Pull images from server
+// Pull files from server
 import pull from './gulp/pull';
 exports.pull = pull;
 
