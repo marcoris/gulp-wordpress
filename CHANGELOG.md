@@ -1,3 +1,24 @@
+<a name="0.1.0"></a>
+# [0.1.0](https://github.com/marcoris/gulpwordpress/compare/v0.0.9...v0.1.0) (2021-05-27)
+
+
+### Bug Fixes
+
+* Getting right args ([969ec95](https://github.com/marcoris/gulpwordpress/commit/969ec95))
+* Improve code ([1d09bc7](https://github.com/marcoris/gulpwordpress/commit/1d09bc7))
+
+
+### Features
+
+* Add npm run scripts ([6346189](https://github.com/marcoris/gulpwordpress/commit/6346189))
+* Add table prefix ([d0edcb1](https://github.com/marcoris/gulpwordpress/commit/d0edcb1))
+* Deploy tasks ([d139718](https://github.com/marcoris/gulpwordpress/commit/d139718))
+* Improve push pull tasks ([a161771](https://github.com/marcoris/gulpwordpress/commit/a161771))
+* Remove dbmigration and add dbimport/dbexport ([17204b8](https://github.com/marcoris/gulpwordpress/commit/17204b8))
+* Rename task and add table prefix ([c16e7ec](https://github.com/marcoris/gulpwordpress/commit/c16e7ec))
+
+
+
 <a name="0.0.9"></a>
 ## [0.0.9](https://github.com/marcoris/gulpwordpress/compare/v0.0.8...v0.0.9) (2021-05-20)
 
