@@ -1,5 +1,6 @@
 import {src, dest} from 'gulp';
 import replace from 'gulp-replace';
+import prompt from 'gulp-prompt';
 import run from 'gulp-run';
 
 import yargs from 'yargs';
@@ -14,35 +15,35 @@ const setup = (done) => {
         var dbuser = process.env.LOCAL_DB_USER;
         var dbpass = process.env.LOCAL_DB_PASS;
         var dbhost = process.env.LOCAL_DB_HOST;
-        var prefix = process.env.DB_PREFIX;
+        var prefix = process.env.LOCAL_DB_PREFIX;
         var debug = process.env.LOCAL_WP_DEBUG;
-        var savequ = process.env.LOCAL_SAVEQUERIES;
-        var disfmo = process.env.LOCAL_DISALLOW_FILE_MODS;
-        var almult = process.env.LOCAL_WP_ALLOW_MULTISITE;
+        var savequeries = process.env.LOCAL_SAVEQUERIES;
+        var disallowfilemods = process.env.LOCAL_DISALLOW_FILE_MODS;
+        var wpallowmultisite = process.env.LOCAL_WP_ALLOW_MULTISITE;
 
         if (typeof yargs.argv.prod !== 'undefined') {
             dbname = process.env.PRODUCTION_DB_NAME;
             dbuser = process.env.PRODUCTION_DB_USER;
             dbpass = process.env.PRODUCTION_DB_PASS;
             dbhost = '';
-            prefix = process.env.DB_PREFIX;
+            prefix = process.env.PRODUCTION_DB_PREFIX;
             debug = process.env.PRODUCTION_WP_DEBUG;
-            savequ = process.env.PRODUCTION_SAVEQUERIES;
-            disfmo = process.env.PRODUCTION_DISALLOW_FILE_MODS;
-            almult = process.env.PRODUCTION_WP_ALLOW_MULTISITE;
+            savequeries = process.env.PRODUCTION_SAVEQUERIES;
+            disallowfilemods = process.env.PRODUCTION_DISALLOW_FILE_MODS;
+            wpallowmultisite = process.env.PRODUCTION_WP_ALLOW_MULTISITE;
         } else if (typeof yargs.argv.stage !== 'undefined') {
             dbname = process.env.STAGING_DB_NAME;
             dbuser = process.env.STAGING_DB_USER;
             dbpass = process.env.STAGING_DB_PASS;
             dbhost = '';
-            prefix = process.env.DB_PREFIX;
+            prefix = process.env.STAGING_DB_PREFIX;
             debug = process.env.STAGING_WP_DEBUG;
-            savequ = process.env.STAGING_SAVEQUERIES;
-            disfmo = process.env.STAGING_DISALLOW_FILE_MODS;
-            almult = process.env.STAGING_WP_ALLOW_MULTISITE;
+            savequeries = process.env.STAGING_SAVEQUERIES;
+            disallowfilemods = process.env.STAGING_DISALLOW_FILE_MODS;
+            wpallowmultisite = process.env.STAGING_WP_ALLOW_MULTISITE;
         }
 
-        var cmd = new run.Command('sh ./shells/getKeys.sh').exec();
+        var cmd = new run.Command('sh ./shells/getKeys.sh && cp ./config/.htaccess ./wwwroot/.htaccess').exec();
         var keys = fs.readFileSync('keys.php', 'utf-8');
 
         src('./config/wp-config.php')
@@ -53,12 +54,22 @@ const setup = (done) => {
             .pipe(replace('@@include', keys))
             .pipe(replace('@@db_prefix', prefix))
             .pipe(replace('@@wp_debug', debug))
-            .pipe(replace('@@save_queries', savequ))
-            .pipe(replace('@@disallow_file_mods', disfmo))
-            .pipe(replace('@@wp_allow_multisite', almult))
+            .pipe(replace('@@save_queries', savequeries))
+            .pipe(replace('@@disallow_file_mods', disallowfilemods))
+            .pipe(replace('@@wp_allow_multisite', wpallowmultisite))
             .pipe(dest('wwwroot'));
     } else {
-        console.log('.env file does not exist.\nRun gulp setupFirst');
+        src('.env_template')
+            .pipe(prompt.prompt({
+                type: 'list',
+                name: 'settingup',
+                message: '.env file does not exist. Copy from template for local use?',
+                choices: ['yes', 'no']
+            }, function(res) {
+                if (res.settingup == 'yes') {
+                    run('cp .env_template .env').exec();
+                }
+            }));
     }
 
     done();
