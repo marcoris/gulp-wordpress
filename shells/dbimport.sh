@@ -1,7 +1,7 @@
 #!/bin/bash
 if [ "$1" = "local" ]
 then
-	# Clear local wordpress database
+	# Clear local WordPress database
 	docker exec -it $(docker ps -aqf "name=gulpwordpress_db_1") mysql -uroot -ptoor -e "DROP DATABASE wordpress; CREATE DATABASE wordpress;"
 	# Import local.sql
 	cat ./sql/local.sql | docker exec -i gulpwordpress_db_1 mysql -uwordpress -pwordpress wordpress
@@ -32,7 +32,7 @@ then
 		PUBLICPATH+="/stage"		
 	fi
 
-	# Connect to host, clear remote wordpress database, import sql dump, remove sql dump file
+	# Connect to host, clear remote WordPress database, import sql dump, remove sql dump file
 	ssh -i ~/.ssh/$SSH_KEY $SSH_USER@$SSH_HOST "cd ~/$PUBLICPATH && wp db clean --yes && wp db import sql/$1.sql; rm -f sql/$1.sql"
 else
 	echo "Wrong parameter!"

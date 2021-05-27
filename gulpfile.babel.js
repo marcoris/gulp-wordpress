@@ -93,13 +93,13 @@ import deploy from './gulp/deploy';
 exports.deploy = deploy;
 
 // Setup wp-config.php
-import setup from './gulp/setup';
-exports.setup = setup;
+import setupWPConfig from './gulp/setupwpconfig';
+exports.setupWPConfig = setupWPConfig;
 
 // Bumps version
 import bumpPrompt from './gulp/bump';
 
-export const setupFirst = series(setupEnvironment, setup, setComposerfile);
+export const firstSetup = series(setupEnvironment, setupWPConfig, setComposerfile);
 export const dev = series(clean, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, plugins, docs, serve, watchForChanges);
 export const build = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, plugins, docs);
 export const buildzip = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, generatezip);

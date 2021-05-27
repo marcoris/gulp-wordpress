@@ -9,7 +9,7 @@ import fs from 'fs';
 require('dotenv').config();
 
 // Setup the wp-config.php for local, stage or production
-const setup = (done) => {
+const setupWPConfig = (done) => {
     if (fs.existsSync('.env')) {
         var dbname = process.env.LOCAL_DB_NAME;
         var dbuser = process.env.LOCAL_DB_USER;
@@ -75,4 +75,4 @@ const setup = (done) => {
     done();
 };
 
-module.exports = setup;
+module.exports = setupWPConfig;
