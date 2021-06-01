@@ -1,0 +1,13 @@
+{
+    "title": "@@themename",
+    "files": [
+        "src/scss/**/*.scss"
+    ],
+    "target": "wwwroot/wp-content/themes/gulpwordpress/styleguide",
+    "css": "wwwroot/wp-content/themes/gulpwordpress/assets/css/style.min.css",
+    "namespace": "page",
+    "verbose": 3,
+    "counterCSS": null,
+    "staticLipsum": false,
+    "placeholderService": false
+}

@@ -27,6 +27,7 @@ build/
 keys.php
 vendor/
 config.nucleus.json
+!config/config.nucleus.json
 composer.json
 composer.lock
 package-lock.json
