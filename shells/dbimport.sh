@@ -2,7 +2,7 @@
 if [ "$1" = "local" ]
 then
 	# Clear local WordPress database
-	docker exec -it $(docker ps -aqf "name=gulpwordpress_db_1") mysql -uroot -ptoor -e "DROP DATABASE wordpress; CREATE DATABASE wordpress;"
+	docker exec -it $(docker ps -aqf "name=gulpwordpress_db_1") mysql -uroot -ptoor -e "DROP DATABASE IF EXISTS wordpress; CREATE DATABASE IF NOT EXISTS wordpress;"
 	# Import local.sql
 	cat ./sql/local.sql | docker exec -i gulpwordpress_db_1 mysql -uwordpress -pwordpress wordpress
 	rm -f ./sql/local.sql
