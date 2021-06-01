@@ -6,6 +6,7 @@
   "main": "index.js",
   "url": "risdesign.ch",
   "scripts": {
+    "install": "gulp firstSetup && composer self-update && composer install",
     "updater": "sh ./shells/updater.sh",
     "start": "gulp",
     "build": "gulp build --prod",
