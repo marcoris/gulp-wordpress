@@ -1,14 +1,29 @@
 import {src, dest} from 'gulp';
 import rename from 'gulp-rename';
 import replace from 'gulp-replace';
+import gulpif from 'gulp-if';
 
 require('dotenv').config();
 
-// Create composer.json with acf pro key to download wordpress plugins
+// Create composer.json with or without acf pro key to download wordpress plugins
 const setComposerfile = () => {
-    return src('composer_template.json')
+    if (process.env.ACF_PRO_KEY !== '') {
+        return setComposerfileWithAcf();
+    }
+
+    return setComposerfileNormal();
+};
+
+const setComposerfileWithAcf = () => {
+    return src('composer_template_acf.json')
         .pipe(replace('@@acf_version', process.env.ACF_VERSION))
         .pipe(replace('@@acf_pro_key', process.env.ACF_PRO_KEY))
+        .pipe(rename('composer.json'))
+        .pipe(dest('.'));
+};
+
+const setComposerfileNormal = () => {
+    return src('composer_template.json')
         .pipe(rename('composer.json'))
         .pipe(dest('.'));
 };
