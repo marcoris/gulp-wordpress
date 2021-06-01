@@ -1,7 +1,7 @@
 # gulpwordpress version 0.1.0
 <p align="center">
-    <img height="150" src="gulp.png">
-    <img height="150" src="wordpress.png">
+    <img height="150" src=".github/gulp.png">
+    <img height="150" src=".github/wordpress.png">
 </p>
 
 Development environment with gulp and docker for developing and deploying WordPress themes.
