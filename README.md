@@ -63,7 +63,8 @@ Next you can initialize a new repo by running:
 git init
 ```
 
-Make sure to adjust the version number and concrete project information in all relevant files (package.json, README.md) then run:
+**Important!**
+Make sure to adjust the version number and concrete project information in all relevant files (`package.json`, `README.md`) then run:
 ```bash
 sh ./shells/installer.sh
 ```
@@ -182,7 +183,7 @@ First run the following command to make the *.pot file: `gulp makepot`. Then tra
 <hr>
 
 #### TODOs :pencil:
-* Correct WP-Translations (*.mo *.po)
+* Issues can be created under: <a href="https://github.com/marcoris/gulpwordpress/issues" target="_blank">https://github.com/marcoris/gulpwordpress/issues</a>
 
 #### Done :white_check_mark:
 * Gulp task to deploy from local to staging or production (`uploads`, `theme`, `database`)
