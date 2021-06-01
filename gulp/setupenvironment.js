@@ -17,10 +17,10 @@ const setupEnvironment = () => {
     src('./config/config.nucleus.json')
         .pipe(replace('@@themename', pkg.name))
         .pipe(dest('.'));
-    if (fs.existsSync('.env_template')) {
+    if (fs.existsSync('./config/.env_template')) {
         if (!fs.existsSync('.env')) {
-            return src('.env_template')
-                .pipe(run('cp .env_template .env'))
+            return src('./config/.env_template')
+                .pipe(run('cp ./config/.env_template .env'))
                 .pipe(prompt.prompt([{
                     type: 'input',
                     name: 'hostinguser',
@@ -88,7 +88,7 @@ const setupEnvironment = () => {
     }
 
     return src('.env')
-        .pipe(run('echo .env_template does not exist!'));
+        .pipe(run('echo ./config/.env_template does not exist!'));
 };
 
 module.exports = setupEnvironment;

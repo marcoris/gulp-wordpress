@@ -59,7 +59,7 @@ const setupWPConfig = (done) => {
             .pipe(replace('@@wp_allow_multisite', wpallowmultisite))
             .pipe(dest('wwwroot'));
     } else {
-        src('.env_template')
+        src('./config/.env_template')
             .pipe(prompt.prompt({
                 type: 'list',
                 name: 'settingup',
@@ -67,7 +67,7 @@ const setupWPConfig = (done) => {
                 choices: ['yes', 'no']
             }, function(res) {
                 if (res.settingup == 'yes') {
-                    run('cp .env_template .env').exec();
+                    run('cp ./config/.env_template .env').exec();
                 }
             }));
     }

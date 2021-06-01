@@ -1,7 +1,6 @@
 import {src, dest} from 'gulp';
 import rename from 'gulp-rename';
 import replace from 'gulp-replace';
-import gulpif from 'gulp-if';
 
 require('dotenv').config();
 
@@ -15,7 +14,7 @@ const setComposerfile = () => {
 };
 
 const setComposerfileWithAcf = () => {
-    return src('composer_template_acf.json')
+    return src('./config/composer_template_acf.json')
         .pipe(replace('@@acf_version', process.env.ACF_VERSION))
         .pipe(replace('@@acf_pro_key', process.env.ACF_PRO_KEY))
         .pipe(rename('composer.json'))
@@ -23,7 +22,7 @@ const setComposerfileWithAcf = () => {
 };
 
 const setComposerfileNormal = () => {
-    return src('composer_template.json')
+    return src('./config/composer_template.json')
         .pipe(rename('composer.json'))
         .pipe(dest('.'));
 };
