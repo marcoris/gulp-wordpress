@@ -1,3 +1,22 @@
+## <small>0.1.1 (2021-06-02)</small>
+
+* chore: Add nucleus config as template ([ee5c963](https://github.com/marcoris/gulpwordpress/commit/ee5c963))
+* chore: Put gulpwordpress images into github folder ([c3c9b84](https://github.com/marcoris/gulpwordpress/commit/c3c9b84))
+* chore: Remove unnecessary htaccess file ([1da3c12](https://github.com/marcoris/gulpwordpress/commit/1da3c12))
+* chore: Updated README ([90473ea](https://github.com/marcoris/gulpwordpress/commit/90473ea))
+* fix: Add gulp shot task to workflow ([6d3520c](https://github.com/marcoris/gulpwordpress/commit/6d3520c))
+* fix: Dropping and creating database if not exists ([4ac2a02](https://github.com/marcoris/gulpwordpress/commit/4ac2a02))
+* fix: Put template files into config directory ([d8af8e8](https://github.com/marcoris/gulpwordpress/commit/d8af8e8))
+* fix: Remove unnecessary packages ([e257bfa](https://github.com/marcoris/gulpwordpress/commit/e257bfa))
+* fix: Removed file from gitignore ([ac6f721](https://github.com/marcoris/gulpwordpress/commit/ac6f721)), closes [#11](https://github.com/marcoris/gulpwordpress/issues/11)
+* feat: Added gulp task after installation ([6eeefb6](https://github.com/marcoris/gulpwordpress/commit/6eeefb6))
+* feat: Added install script for npm ([b43771e](https://github.com/marcoris/gulpwordpress/commit/b43771e))
+* feat: Setting up composerfile with or without acf pro ([9eb76ee](https://github.com/marcoris/gulpwordpress/commit/9eb76ee))
+* Create codeql-analysis.yml ([6b8e5d8](https://github.com/marcoris/gulpwordpress/commit/6b8e5d8))
+* Create SECURITY.md ([83290d9](https://github.com/marcoris/gulpwordpress/commit/83290d9))
+
+
+
 <a name="0.1.0"></a>
 # [0.1.0](https://github.com/marcoris/gulpwordpress/compare/v0.0.9...v0.1.0) (2021-05-27)
 
