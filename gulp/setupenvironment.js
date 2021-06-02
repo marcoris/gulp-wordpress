@@ -1,6 +1,7 @@
 import {src, dest} from 'gulp';
 import prompt from 'gulp-prompt';
 import replace from 'gulp-replace';
+import rename from 'gulp-rename';
 import run from 'gulp-run';
 
 import pkg from '../package.json';
@@ -14,9 +15,11 @@ const setupEnvironment = () => {
         cwd = cwd[cwd.length - 1];
     }
 
-    src('./config/config.nucleus.json')
+    src('./config/nucleus_template.json')
         .pipe(replace('@@themename', pkg.name))
+        .pipe(rename('config.nucleus.json'))
         .pipe(dest('.'));
+
     if (fs.existsSync('./config/.env_template')) {
         if (!fs.existsSync('.env')) {
             return src('./config/.env_template')
