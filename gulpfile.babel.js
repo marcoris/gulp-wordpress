@@ -29,10 +29,6 @@ import renametextdomain from './gulp/renametextdomain';
 import makepot from './gulp/makepot';
 exports.makepot = series(renametextdomain, makepot);
 
-// PO to MO
-import potomo from './gulp/potomo';
-exports.potomo = potomo;
-
 // Compiles the styleguide
 import docs from './gulp/docs';
 exports.docs = docs;
@@ -65,13 +61,19 @@ import images from './gulp/images';
 exports.images = images;
 
 // Plugins task
-import plugins from './gulp/plugins';
+import copyplugins from './gulp/copyplugins';
 
 // PHP task
 import copyphp from './gulp/copyphp';
 
-// Copy files (mo,po,htaccess)
-import copyfiles from './gulp/copyfiles';
+// Copy .htaccess file
+import copyhtaccess from './gulp/copyhtaccess';
+
+// Copy translation files (mo,po)
+import copytranslations from './gulp/copytranslations';
+
+// Copy translation file *.pot
+import copypot from './gulp/copypot';
 
 // Generate theme as zip to upload
 import generatezip from './gulp/generatezip';
@@ -100,9 +102,9 @@ exports.setupWPConfig = setupWPConfig;
 import bumpPrompt from './gulp/bump';
 
 export const firstSetup = series(setupEnvironment, setupWPConfig, setComposerfile);
-export const dev = series(clean, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, plugins, docs, serve, watchForChanges);
-export const build = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, plugins, docs, shot);
-export const buildzip = series(cleanall, styles, images, makepot, copyfiles, copyphp, scripts, addbanner, shot, generatezip);
+export const dev = series(clean, styles, images, makepot, copyhtaccess, copypot, copytranslations, copyphp, copyplugins, scripts, addbanner, docs, serve, watchForChanges);
+export const build = series(cleanall, styles, images, makepot, copyhtaccess, copypot, copytranslations, copyphp, copyplugins, scripts, addbanner, docs, shot);
+export const buildzip = series(cleanall, styles, images, makepot, copyhtaccess, copypot, copytranslations, copyphp, copyplugins, scripts, addbanner, shot, generatezip);
 export const bump = series(bumpPrompt);
 export const updateACFPro = series(setComposerfile, composerUpdate);
 
