@@ -10,7 +10,7 @@ function gulpwordpress_post_meta() {
     );
     /* tanslators: %s: Post Author */
     printf(
-        esc_html__(' By %s ', 'gulpwordpress'),
+        esc_html__('by %s', 'gulpwordpress'),
         '<a href="' . esc_url(get_author_posts_url( get_the_author_meta( 'ID' ) )) . '">' . esc_html
         (get_the_author( )) . '</a>'
 
@@ -23,7 +23,7 @@ function gulpwordpress_readmore_link() {
     /* tanslators: %s: Post Title */
     printf(
         wp_kses(
-            __(' Read More <span class="u-screen-reader-text">About %s</span> ', 'gulpwordpress'),
+            __('Read More <span class="u-screen-reader-text">About %s</span>', 'gulpwordpress'),
             [
                 'span' => [
                     'class' => []

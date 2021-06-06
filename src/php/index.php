@@ -18,7 +18,11 @@
     <?php the_posts_pagination( ); ?>
 <?php } else { ?>
     <p><?php esc_html_e('Sorry, no posts matched your criteria.', 'gulpwordpress'); ?></p>
-<?php } ?>    
+<?php } ?>
+
+<?php if (is_active_sidebar('sidebar')) :
+            dynamic_sidebar('sidebar');
+            endif; ?>
 
 <?php
 
