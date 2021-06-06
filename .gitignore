@@ -1,3 +1,16 @@
+# OS X Stuff
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+Thumbs.db
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
 # Logs
 logs
 *.log
@@ -7,10 +20,14 @@ npm-debug.log*
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # Dependency directories
-node_modules/
+node_modules
 
 # Optional npm cache directory
 .npm
+
+# Sass Files
+.sass-cache
+*.css.map
 
 # Optional eslint cache
 .eslintcache
@@ -21,14 +38,24 @@ node_modules/
 # Builded zip
 *.zip
 
+# all wordpress files
 wwwroot/
-build/
 
-keys.php
+# Composer Files
 vendor/
+
+# config and packages
+keys.php
 config.nucleus.json
 !config/config.nucleus.json
 composer.json
 composer.lock
 package-lock.json
 sql/*
+
+# generated translation files
+src/languages/*.mo
+src/languages/*.po
+
+build/
+src/plugins/
