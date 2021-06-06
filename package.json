@@ -1,6 +1,6 @@
 {
   "name": "gulpwordpress",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "year": "2021",
   "description": "Automated WordPress Theme development environment run by Gulp using Sass, Babel, linters and BrowserSync.",
   "main": "index.js",

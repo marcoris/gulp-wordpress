@@ -1,3 +1,18 @@
+## 0.2.0 (2021-06-06)
+
+* feat: Add language plugins to composerfile ([fa01811](https://github.com/marcoris/gulpwordpress/commit/fa01811))
+* feat: Translation tasks ([158a459](https://github.com/marcoris/gulpwordpress/commit/158a459))
+* feat(php): Add widgets, menu and debugger ([0829edd](https://github.com/marcoris/gulpwordpress/commit/0829edd))
+* feat(pot): Add language file ([f39d666](https://github.com/marcoris/gulpwordpress/commit/f39d666))
+* chore: Update gitignore ([c734b38](https://github.com/marcoris/gulpwordpress/commit/c734b38))
+* chore: Updated README ([4f8dfaf](https://github.com/marcoris/gulpwordpress/commit/4f8dfaf))
+* chore(js): Add copyhtaccess task in separate file ([4984ccf](https://github.com/marcoris/gulpwordpress/commit/4984ccf))
+* chore(php): Add filesystem method to prevent from credentials ([2f991eb](https://github.com/marcoris/gulpwordpress/commit/2f991eb))
+* chore(scss): Remove annoying fuchsia and add padding ([e9a94cf](https://github.com/marcoris/gulpwordpress/commit/e9a94cf))
+* fix(php): Fixed typos ([3d79eea](https://github.com/marcoris/gulpwordpress/commit/3d79eea))
+
+
+
 ## <small>0.1.1 (2021-06-02)</small>
 
 * chore: Add nucleus config as template ([ee5c963](https://github.com/marcoris/gulpwordpress/commit/ee5c963))
