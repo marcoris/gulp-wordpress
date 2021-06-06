@@ -15,6 +15,9 @@ define('DB_CHARSET', 'utf8');
 /** Der collate type sollte nicht geändert werden */
 define('DB_COLLATE', '');
 
+// Prevent from asking the creds (installing plugins or themes)
+define('FS_METHOD','direct');
+
 /**
  * Sicherheitsschlüssel
  * @seit 2.6.0
