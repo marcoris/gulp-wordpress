@@ -1,9 +1,10 @@
 // This is the main styles file
 @import 'atoms/button';
 
-$color: #f0f;
+$color: #fff;
 
 body {
     background-color: $color;
     box-shadow: 0 0 10px;
+    padding: 10px;
 }
