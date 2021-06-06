@@ -112,7 +112,6 @@ to install all npm dependencies, setting up the devEnv, installing composer pack
 | gulp push | Pushes the local `themes`, `uploads` or `both` directories to remote |
 | gulp pull | Pulls the remote `themes`, `uploads` or `both` directories to local |
 | gulp makepot | Makes the *.pot file |
-| gulp potomo | Compiles the pot file to the *.mo binary |
 | gulp docs | Runs the nucleus styleguide building script |
 | gulp shot | Generates the screenshot.png - Cheeeeese :smile: |
 | gulp setupWPConfig | Sets the `wp-config.php` file for local use |
@@ -171,7 +170,8 @@ Set the new Versionnumber in the `.env` file under `WP_VERSION`. Then run `gulp 
 <hr>
 
 # Translation :book:
-First run the following command to make the *.pot file: `gulp makepot`. Then translate it with poedit and save the *.po file. After saving run `gulp potomo` to generate the binary file in the wwwroot directory.
+If there is no `{themename}.pot` file in the `src/languages` folder run the following command to make the `{themename}.pot` file: `gulp makepot`.
+Then make the translation in wich language you want and save it as `{themename}-lang_LANG.po` file.
 
 <hr>
 
@@ -181,19 +181,5 @@ First run the following command to make the *.pot file: `gulp makepot`. Then tra
 - Then you have to choose between `wwwroot` or `uploads and theme`
 
 <hr>
-
-#### TODOs :pencil:
-* Issues can be created under: <a href="https://github.com/marcoris/gulpwordpress/issues" target="_blank">https://github.com/marcoris/gulpwordpress/issues</a>
-
-#### Done :white_check_mark:
-* Gulp task to deploy from local to staging or production (`uploads`, `theme`, `database`)
-* Gulp task to get data from stage or production (both `uploads` dir and `sql dump` at the same time)
-* Put gulp tasks (setup, version bump, release) in separate files to keep it clean
-* Gulp task to push `uploads` directory from local to remote (staging or production)
-* Gulp task to pull `uploads` directory from remote (staging or production) to local
-* Gulp task to deploying the theme on staging or production
-* Gulp task to update WordPress
-* DB migrating script
-* Remove the Vagrant stuff and add docker stuff
 
 Made with :heart: in Switzerland.
